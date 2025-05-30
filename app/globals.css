@@ -1,26 +1,61 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --foreground-rgb: 0, 0, 0;
+  --background-rgb: 243, 244, 246;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: rgb(var(--foreground-rgb));
+  background-color: rgb(var(--background-rgb)); /* Fallback color */
+  background-image: linear-gradient(to bottom, rgba(0, 0, 0, .8), rgba(176, 35, 35, .6)), url("/leechingwei2.jpg"); /* Gradient layered with image */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  font-size: 14px;
+}
+
+.badminton-court-card {
+  background-image: url("/badminton-linev2.png");
+background-size: contain; 
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  padding: 40px;
+}
+.court-sideline-left,
+.court-sideline-right,
+.net-court-line {
+  background-color: #3d3131;
+  position: absolute;
+  width: 1px;
+  height: 100%;
+  top: 0;
+  z-index: -1;
+}
+.court-topline,
+.court-bottomline {
+  background-color: #3d3131;
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  z-index: -1;
+  left: 0;
+}
+.court-sideline-left {
+    left: 50%;
+    transform: translateX(-50%);
+}
+.net-court-line {
+    left: 10%;
+}
+.court-sideline-right {
+    right: 10%;
+}
+.court-topline {
+  top: 15%;
+}
+.court-bottomline {
+  bottom: 15%;
 }
