@@ -12,7 +12,16 @@ import { useData } from '@/context/DataContext';
 
 const Page = () => {
   const { state } = useData();
-  const { queue } = state;
+  const { queue, players } = state;
+  
+
+  const availablePlayers = players.filter(player => 
+    !player.currentlyPlaying
+  );
+
+  const donePlayers = players.filter(player => 
+    player.donePlaying
+  );
 
   const addPlayerModal = useModal();
   // Add 'history' to the possible tab states
@@ -20,7 +29,15 @@ const Page = () => {
 
   return (
     <div className='space-y-8 px-3 sm:px-4'>
-      {/* Floating add player button */}
+      {(availablePlayers.length - donePlayers.length) === 0 && (
+        <>
+          <div className="fixed z-10 bottom-[10px] right-[85px] py-1.5 px-2.5 bg-gray-900 text-sm text-white rounded-[6px] flex items-center justify-center bounce-animate">
+            Add Player
+            <div className="absolute right-[-6px] top-1/2 -translate-y-1/2 w-0 h-0 border-y-8 border-y-transparent border-l-8 border-l-gray-900"></div>
+          </div>
+        </>
+      )}
+
       <button
         onClick={addPlayerModal.openModal}
         className="fixed w-[55px] h-[55px] z-10 bottom-[15px] mb-4 shadow-2xl right-[20px] bg-blue-500 hover:bg-blue-600 cursor-pointer text-[22px] text-white rounded-[50px] flex items-center justify-center"
@@ -36,14 +53,14 @@ const Page = () => {
         maxWidth="2xl"
       >
         <div className="max-h-[70vh] overflow-y-auto">
-          <AddPlayerForm inModal={true} />
+          <AddPlayerForm inModal={true} onPlayerAdded={() => setActiveTab('players')} />
         </div>
       </Modal>
       
       {/* Custom Tab Menu - Updated with third tab */}
       <div className="flex border-b bg-white p-1 h-[40px] rounded-md justify-between items-center mb-0">
         <button
-          className={`h-full px-3 text-sm focus:outline-none flex items-center gap-1.5 w-full cursor-pointer text-center justify-center ${
+          className={`h-full sm:px-3 px-1.5 sm:text-sm text-[13px] focus:outline-none flex items-center gap-1.5 w-full cursor-pointer text-center justify-center ${
             activeTab === 'players' 
               ? 'bg-blue-500 text-white rounded-md' 
               : 'text-gray-600'
@@ -53,7 +70,7 @@ const Page = () => {
           Players
         </button>
         <button
-          className={`h-full px-3 text-sm focus:outline-none flex items-center gap-1.5 w-full cursor-pointer text-center justify-center ${
+          className={`h-full sm:px-3 px-1.5 sm:text-sm text-[13px] focus:outline-none flex items-center gap-1.5 w-full cursor-pointer text-center justify-center ${
             activeTab === 'queue' 
               ? 'bg-blue-500 text-white rounded-md' 
               : 'text-gray-600'
@@ -63,7 +80,7 @@ const Page = () => {
           Queue {queue.length > 0 ? <span className="text-[11px] w-[16px] h-[16px] inline-flex items-center justify-center rounded-[59px] bg-red-500 text-white font-medium">{queue.length}</span> : ''}
         </button>
         <button
-          className={`h-full px-3 text-sm focus:outline-none flex items-center gap-1.5 w-full cursor-pointer text-center justify-center ${
+          className={`h-full sm:px-3 px-1.5 sm:text-sm text-[13px] focus:outline-none flex items-center gap-1.5 w-full cursor-pointer text-center justify-center ${
             activeTab === 'history' 
               ? 'bg-blue-500 text-white rounded-md' 
               : 'text-gray-600'
@@ -76,7 +93,7 @@ const Page = () => {
       
       {/* Tab Content - Updated with MatchHistory */}
       <div className="mt-4">
-        {activeTab === 'players' && <AddToQueueForm />}
+        {activeTab === 'players' && <AddToQueueForm /> }
         {activeTab === 'queue' && <QueueDisplay />}
         {activeTab === 'history' && <MatchHistory />}
       </div>

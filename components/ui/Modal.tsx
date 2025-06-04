@@ -156,7 +156,7 @@ export default function Modal({
 
   return createPortal(
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/65 p-4 transition-opacity duration-300 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/65 px-3 sm:px-4 transition-opacity duration-300 ${
         isAnimating ? 'pointer-events-none' : ''
       }`}
       onClick={handleBackdropClick}
@@ -182,7 +182,7 @@ export default function Modal({
             {showCloseButton && (
               <button
                 type="button"
-                className="text-[23px] text-gray-600"
+                className="text-[25px] text-gray-600"
                 onClick={onClose}
                 aria-label="Close"
               >
@@ -193,7 +193,7 @@ export default function Modal({
         )}
 
         {/* Modal Content */}
-        <div className="px-4 py-4">
+        <div className="px-4 py-4 pt-3">
           {children}
         </div>
       </div>

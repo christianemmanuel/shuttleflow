@@ -59,3 +59,17 @@ background-size: contain;
 .court-bottomline {
   bottom: 15%;
 }
+
+
+.bounce-animate {
+  -webkit-animation: bounce .4s ease infinite alternate;
+}
+
+@-webkit-keyframes bounce {
+  0% {
+    transform:translateX(0px);
+  }
+  100% {
+    transform:translateX(-17px);
+  }
+}

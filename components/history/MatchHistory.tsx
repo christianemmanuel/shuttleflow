@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { useData } from '@/context/DataContext';
 import { formatTime, formatCurrency } from '@/lib/utils';
+import { LuUserSearch } from "react-icons/lu";
+import { GiShuttlecock } from "react-icons/gi";
 
 export default function MatchHistory() {
   const { state } = useData();
@@ -78,7 +80,7 @@ export default function MatchHistory() {
     
     if (match.isDoubles && matchPlayers.length === 4) {
       return (
-        <div className="flex items-center justify-between sm:justify-center space-x-2 capitalize">
+        <div className="text-center sm:px-3 sm:py-2 p-1.5 bg-blue-50 rounded-md border border-blue-100 w-full flex items-center justify-between space-x-2 capitalize">
           <span className="font-medium text-blue-800">{matchPlayers[0]?.name} & {matchPlayers[1]?.name}</span>
           <span className="text-xs px-2 py-1 bg-gray-200 text-[9px] rounded-full font-bold">VS</span>
           <span className="font-medium text-red-800">{matchPlayers[2]?.name} & {matchPlayers[3]?.name}</span>
@@ -86,7 +88,7 @@ export default function MatchHistory() {
       );
     } else if (!match.isDoubles && matchPlayers.length === 2) {
       return (
-        <div className="flex items-center justify-between sm:justify-center space-x-2 capitalize">
+        <div className="text-center sm:px-3 sm:py-2 p-1.5 bg-blue-50 rounded-md border border-blue-100 w-full flex items-center justify-between space-x-2 capitalize">
           <span className="font-medium text-blue-800">{matchPlayers[0]?.name}</span>
           <span className="text-xs px-2 py-1 bg-gray-200 text-[9px] rounded-full font-bold">VS</span>
           <span className="font-medium text-red-800">{matchPlayers[1]?.name}</span>
@@ -104,64 +106,61 @@ export default function MatchHistory() {
   return (
     <div className="bg-white p-4 rounded-lg shadow-md mb-6">
       {/* Filters and Search */}
-      <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Search Box */}
-        <div className="col-span-1 md:col-span-1">
-          <label className="block text-xs text-gray-500 mb-1">Search Players</label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+      { matchHistory.length >= 1 && (
+        <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Search Box */}
+          <div className="col-span-1 md:col-span-1">
+            <div className="relative">
+              <LuUserSearch className="absolute left-3 text-[16px] top-[10.5px] text-gray-500" />
+              <input
+                type="text"
+                placeholder="Search by player name..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 pl-8"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
             </div>
-            <input
-              type="text"
-              placeholder="Search by player name..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-              >
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            )}
+          </div>
+          
+          {/* Date Filter */}
+          <div className='hidden'>
+            <label className="block text-xs text-gray-500 mb-1">Filter by Date</label>
+            <select
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value as 'all' | 'today' | 'week')}
+              className="w-full border rounded-md px-3 py-2"
+            >
+              <option value="all">All Time</option>
+              <option value="today">Today</option>
+              <option value="week">This Week</option>
+            </select>
+          </div>
+          
+          {/* Sort Options */}
+          <div className='hidden'>
+            <label className="block text-xs text-gray-500 mb-1">Sort By</label>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as 'recent' | 'oldest' | 'duration')}
+              className="w-full border rounded-md px-3 py-2"
+            >
+              <option value="recent">Most Recent</option>
+              <option value="oldest">Oldest First</option>
+              <option value="duration">Duration (Longest)</option>
+            </select>
           </div>
         </div>
-        
-        {/* Date Filter */}
-        <div className='hidden'>
-          <label className="block text-xs text-gray-500 mb-1">Filter by Date</label>
-          <select
-            value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value as 'all' | 'today' | 'week')}
-            className="w-full border rounded-md px-3 py-2"
-          >
-            <option value="all">All Time</option>
-            <option value="today">Today</option>
-            <option value="week">This Week</option>
-          </select>
-        </div>
-        
-        {/* Sort Options */}
-        <div className='hidden'>
-          <label className="block text-xs text-gray-500 mb-1">Sort By</label>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as 'recent' | 'oldest' | 'duration')}
-            className="w-full border rounded-md px-3 py-2"
-          >
-            <option value="recent">Most Recent</option>
-            <option value="oldest">Oldest First</option>
-            <option value="duration">Duration (Longest)</option>
-          </select>
-        </div>
-      </div>
+      )}
       
       {/* Results Count */}
       {(searchQuery || dateFilter !== 'all') && (
@@ -184,10 +183,7 @@ export default function MatchHistory() {
       {/* Match History List */}
       {sortedHistory.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-lg">
-          <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} 
-              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+          <GiShuttlecock size="3em" className="text-gray-600 mx-auto rotate-190" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">No match history found</h3>
           <p className="mt-1 text-sm text-gray-500">
             {searchQuery ? 
@@ -221,17 +217,17 @@ export default function MatchHistory() {
                 
                 {/* Match Details */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                  <div className="bg-gray-50 p-2 rounded">
+                  <div className="bg-blue-50 rounded-md border border-blue-100 p-2">
                     <div className="text-gray-500">Duration</div>
                     <div className="font-medium">{match.durationMinutes} minutes</div>
                   </div>
                   
-                  <div className="bg-gray-50 p-2 rounded">
+                  <div className="bg-blue-50 rounded-md border border-blue-100 p-2">
                     <div className="text-gray-500">Court</div>
                     <div className="font-medium">Court #{match.courtId}</div>
                   </div>
       
-                  <div className="bg-gray-50 p-2 rounded hidden">
+                  <div className="bg-blue-50 rounded-md border border-blue-100 p-2 hidden">
                     <div className="text-gray-500">Total Fees</div>
                     <div className="font-medium">
                       {formatCurrency(match.feesCharged, feeConfig.currency)}

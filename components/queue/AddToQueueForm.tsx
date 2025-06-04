@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useData } from '@/context/DataContext';
 import { LuUserSearch } from "react-icons/lu";
+import { GiShuttlecock } from "react-icons/gi";
 
 export default function AddToQueueForm() {
   const { state, addPlayerToQueue, markPlayersAsDonePlaying } = useData();
@@ -176,11 +177,11 @@ export default function AddToQueueForm() {
               />
               
               {/* Custom toggle switch */}
-              <div className={`relative w-[32px] h-[20px] rounded-full mr-2 transition-colors duration-200 ease-in-out ${showDonePlayers ? 'bg-blue-500' : 'bg-gray-300'}`}>
+              <div className={`relative min-w-[32px] h-[20px] rounded-full mr-2 transition-colors duration-200 ease-in-out ${showDonePlayers ? 'bg-blue-500' : 'bg-gray-300'}`}>
                 <div className={`absolute w-[16px] h-[16px] bg-white rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${showDonePlayers ? 'translate-x-[13px]' : 'translate-x-[2.5px]'}`} style={{ top: '2px' }}></div>
               </div>
               
-              <span>Show players marked as &quot;done playing&quot; ({donePlayersCount} players)</span>
+              <span>Show done playing</span>
             </label>
           </div>
         )}
@@ -200,8 +201,10 @@ export default function AddToQueueForm() {
         {/* Player Selection */}
         <div className="mb-4">          
           {filteredPlayers.length === 0 ? (
-            <div className="p-4 bg-gray-50 rounded-md text-center">
-              <p className="text-gray-500 italic text-[12px] sm:text-sm">No available players found</p>
+            <div className="text-center py-12 bg-gray-50 rounded-lg">
+              <GiShuttlecock size="3em" className="text-gray-600 mx-auto rotate-190" />
+              <h3 className="mt-2 text-sm font-medium text-gray-900">No available players</h3>
+              <p className="mt-1 text-sm text-gray-500">Get started by adding players</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
@@ -251,7 +254,7 @@ export default function AddToQueueForm() {
           )}
         </div>
         
-        <div className="flex">
+        <div className="flex space-x-4 sm:flex-row justify-between flex-col sm:gap-0 gap-2 pt-0 sm:pt-2">
           <button
             type="submit"
             disabled={
@@ -259,7 +262,7 @@ export default function AddToQueueForm() {
               (gameType === 'singles' && selectedPlayers.length !== 2) || 
               (gameType === 'doubles' && selectedPlayers.length !== 4)
             }
-            className="w-full md:w-auto bg-purple-500 hover:bg-purple-600 text-white h-[42px] px-5 rounded disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="w-full md:w-auto bg-purple-500 hover:bg-purple-600 text-white sm:h-[42px] h-[38px] px-7 rounded disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             Add to Queue
           </button>
@@ -268,7 +271,7 @@ export default function AddToQueueForm() {
             type="button"
             onClick={handleDonePlaying}
             disabled={selectedPlayers.length === 0}
-            className="text-red-500 py-2 px-4 rounded disabled:text-gray-300 disabled:cursor-not-allowed ml-auto"
+            className="text-red-500 py-1 px-2 rounded disabled:text-gray-300 disabled:cursor-not-allowed"
           >
             Done playing
           </button>

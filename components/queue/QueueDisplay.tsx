@@ -4,6 +4,7 @@ import React from 'react';
 import { useData } from '@/context/DataContext';
 import { formatTime } from '@/lib/utils';
 import { Player } from '@/types';
+import { GiShuttlecock } from "react-icons/gi";
 
 export default function QueueDisplay() {
   const { state, removePlayerFromQueue, assignToCourt } = useData();
@@ -44,15 +45,15 @@ export default function QueueDisplay() {
       
       return (
         <div className="mb-5">
-          <div className="flex items-center justify-center mt-2 mb-3">
-            <div className="text-center px-3 py-2 bg-blue-50 rounded-lg border border-blue-100 w-full">
-              <div className="flex items-center justify-between capitalize">
-                <div className="text-[15px] font-medium text-blue-800">
-                  🏸 {team1[0].name} & {team1[1].name}
+          <div className="flex items-center justify-center mt-2 mb-3 ">
+            <div className="text-center sm:px-3 sm:py-2 p-1.5 bg-blue-50 rounded-md border border-blue-100 w-full">
+              <div className="flex items-center justify-between capitalize sm:flex-row flex-col sm:gap-0.5 gap-2.5">
+                <div className="text-sm font-medium text-blue-800">
+                  {team1[0].name} & {team1[1].name}
                 </div>
-                <div className="text-xs px-2 py-1 bg-gray-200 text-[9px] rounded-full font-bold">VS</div>
-                <div className="text-[15px] font-medium text-green-800">
-                  🏸 {team2[0].name} & {team2[1].name}
+                <div className="text-xs px-2 py-1 bg-gray-200 text-[9px] rounded-full font-bold sm:uppercase lowercase">vs</div>
+                <div className="text-sm font-medium text-green-800">
+                  {team2[0].name} & {team2[1].name}
                 </div>
               </div>
             </div>
@@ -64,14 +65,14 @@ export default function QueueDisplay() {
       return (
         <div className="mb-5">
           <div className="flex items-center justify-center mt-2 mb-3">
-            <div className="text-center px-3 py-2 bg-blue-50 rounded-lg border border-blue-100 w-full">
-              <div className="flex items-center justify-between capitalize">
-                <div className="text-[15px] font-medium text-blue-800">
-                  🏸 {queuedPlayers[0].name}
+            <div className="text-center sm:px-3 sm:py-2 p-1.5 bg-blue-50 rounded-md border border-blue-100 w-full">
+              <div className="flex items-center justify-between capitalize sm:flex-row flex-col">
+                <div className="text-sm font-medium text-blue-800">
+                  {queuedPlayers[0].name}
                 </div>
-                <div className="text-xs px-2 py-1 bg-gray-200 text-[9px] rounded-full font-bold">VS</div>
-                <div className="text-[15px] font-medium text-green-800">
-                  🏸 {queuedPlayers[1].name}
+                <div className="text-xs px-2 py-1 bg-gray-200 text-[9px] rounded-full font-bold sm:uppercase lowercase">vs</div>
+                <div className="text-sm font-medium text-green-800">
+                  {queuedPlayers[1].name}
                 </div>
               </div>
             </div>
@@ -105,7 +106,7 @@ export default function QueueDisplay() {
   return (
     <div className="bg-white p-4 rounded-lg shadow-md mb-5">
       {queue.length > 0 && (
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center sm:mb-3 mb-2">
           <span className="text-sm text-gray-500">
             {queue.length} {queue.length === 1 ? 'match' : 'matches'} waiting
           </span>
@@ -113,8 +114,10 @@ export default function QueueDisplay() {
       )}
   
       {queue.length === 0 ? (
-        <div className='p-4 bg-gray-50 rounded-md text-center'>
-          <p className="text-gray-500 italic text-center text-[12px] sm:text-sm">No players in queue</p>
+        <div className="text-center py-12 bg-gray-50 rounded-lg">
+          <GiShuttlecock size="3em" className="text-gray-600 mx-auto rotate-190" />
+          <h3 className="mt-2 text-sm font-medium text-gray-900">No players in queue</h3>
+          <p className="mt-1 text-sm text-gray-500">Get started by adding players</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -130,8 +133,8 @@ export default function QueueDisplay() {
                       {queueItem.isDoubles ? 'Doubles' : 'Singles'} Match
                     </span>
                   </div>
-                  <span className="text-xs text-gray-500">
-                    Requested at {formatTime(queueItem.requestedTime)}
+                  <span className="text-xs text-gray-500 mt-[3px]">
+                    Requested {formatTime(queueItem.requestedTime)}
                   </span>
                 </div>
                 
@@ -146,7 +149,7 @@ export default function QueueDisplay() {
                         <button
                           key={court.id}
                           onClick={() => handleAssignMatch(queueItem.id, queueItem.playerIds, court.id)}
-                          className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded text-sm cursor-pointer transition"
+                          className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded sm:text-sm text-[13px] cursor-pointer transition"
                         >
                           Court {court.id}
                         </button>
@@ -159,7 +162,7 @@ export default function QueueDisplay() {
                   
                   <button
                     onClick={() => removePlayerFromQueue(queueItem.id)}
-                    className="text-red-500 hover:text-red-800 text-sm py-1 px-3 cursor-pointer"
+                    className="text-red-500 hover:text-red-800 text-sm sm:text-center text-left sm:px-2 px-0 sm:mt-0 mt-2 cursor-pointer"
                   >
                     Cancel match
                   </button>

@@ -67,17 +67,17 @@ export default function PageLoader({
     >
       <div className="flex flex-col items-center">
         {/* Lottie Animation or Fallback */}
-        <div className="w-64 h-64 mb-4 flex items-center justify-center">
-          
-
+        <div className="mb-2 flex items-center justify-center">
           {lottieData  ? (
-            <Lottie 
-              animationData={lottieData}
-              loop={true}
-              autoplay={true}
-            />
+            <div className='w-[180px] h-[180px] sm:w-[250px] sm:h-[250px] '>
+              <Lottie 
+                animationData={lottieData}
+                loop={true}
+                autoplay={true}
+              />
+            </div>
           ) : (
-            <p className='text-white text-[15px] font-bold tracking-wider fancy-text'>Getting ready to smash it!</p>
+            <p className='text-white text-[15px] font-bold tracking-wider fancy-text'>Just a quick warm-up...</p>
           )}
         </div>
         

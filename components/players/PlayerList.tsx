@@ -56,17 +56,17 @@ export default function PlayerList() {
   };
   
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md mb-6">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-bold">Player List ({sortedPlayers.length})</h3>
+    <div className="bg-white sm:p-4 p-3 rounded-lg shadow-md mb-6">
+      <div className="flex justify-between items-center mb-3">
+        <h3 className="md:text-lg text-sm font-bold">Player List ({sortedPlayers.length})</h3>
       </div>
       
       {/* Search and Filter Controls */}
-      <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="mb-4 grid grid-cols-1 md:grid-cols-[33.33%_66.67%]">
         {/* Search Box */}
         <div className="col-span-1 md:col-span-1">
           <label className="block text-xs text-gray-500 mb-1">Search Players</label>
-          <div className="relative">
+          <div className="relative md:pr-3 pr-0">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -77,7 +77,7 @@ export default function PlayerList() {
               placeholder="Search by name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 pl-8 h-[38px]"
             />
             {searchQuery && (
               <button
@@ -92,35 +92,36 @@ export default function PlayerList() {
           </div>
         </div>
         
-        {/* Status Filter */}
-        <div>
-          <label className="block text-xs text-gray-500 mb-1">Filter by Status</label>
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value as 'all' | 'available' | 'playing' | 'queued' | 'done')}
-            className="w-full border rounded-md px-3 py-2"
-          >
-            <option value="all">All Players</option>
-            <option value="available">Available</option>
-            <option value="playing">Currently Playing</option>
-            <option value="queued">In Queue</option>
-            <option value="done">Inactive</option>
-          </select>
+        <div className='flex flex-row justify-between gap-3 md:mt-0 mt-3 md:mb-0 mb-2'>
+          <div className='w-full'>
+            <label className="block text-xs text-gray-500 mb-1">Filter by Status</label>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value as 'all' | 'available' | 'playing' | 'queued' | 'done')}
+              className="w-full border rounded-md px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 h-[38px]"
+            >
+              <option value="all">All Players</option>
+              <option value="available">Available</option>
+              <option value="playing">Currently Playing</option>
+              <option value="queued">In Queue</option>
+              <option value="done">Inactive</option>
+            </select>
+          </div>
+          
+          <div className='w-full'>
+            <label className="block text-xs text-gray-500 mb-1">Sort By</label>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as 'name' | 'games' | 'fees')}
+              className="w-full border rounded-md px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 h-[38px]"
+            >
+              <option value="name">Name</option>
+              <option value="games">Games Played</option>
+              <option value="fees">Total Fees</option>
+            </select>
+          </div>
         </div>
         
-        {/* Sort Options */}
-        <div>
-          <label className="block text-xs text-gray-500 mb-1">Sort By</label>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as 'name' | 'games' | 'fees')}
-            className="w-full border rounded-md px-3 py-2"
-          >
-            <option value="name">Name</option>
-            <option value="games">Games Played</option>
-            <option value="fees">Total Fees</option>
-          </select>
-        </div>
       </div>
       
       {/* Results Count & Clear Filters */}
