@@ -1,11 +1,13 @@
-'use client';
-
 import './globals.css';
 import { Inter } from 'next/font/google';
-import Header from '@/components/ui/Header';
-import { DataProvider } from '@/context/DataContext';
+import ClientLayout from './client-layout';
 
 const inter = Inter({ subsets: ['latin'] });
+
+export const metadata = {
+  title: 'ShuttleFlow - Smart Badminton Queuing Management',
+  description: 'Smart badminton court management system',
+};
 
 export default function RootLayout({
   children,
@@ -15,12 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} bg-gray-100 min-h-screen`}>
-        <DataProvider>
-          <Header />
-          <main className="mx-auto py-6">
-            {children}
-          </main>
-        </DataProvider>
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   );

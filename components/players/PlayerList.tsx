@@ -10,7 +10,7 @@ export default function PlayerList() {
   
   // Add search state
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'available' | 'playing' | 'queued'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'available' | 'playing' | 'queued' | 'done'>('all');
   const [sortBy, setSortBy] = useState<'name' | 'games' | 'fees'>('name');
   
   // Filter players based on status and search query
@@ -18,9 +18,10 @@ export default function PlayerList() {
     // First filter by status
     const statusMatch = 
       filterStatus === 'all' ? true :
-      filterStatus === 'available' ? (!player.currentlyPlaying && !player.inQueue) :
+      filterStatus === 'available' ? (!player.currentlyPlaying && !player.inQueue && !player.donePlaying) :
       filterStatus === 'playing' ? player.currentlyPlaying :
-      filterStatus === 'queued' ? player.inQueue : true;
+      filterStatus === 'queued' ? player.inQueue :
+      filterStatus === 'done' ? player.donePlaying : true;
     
     // Then filter by search query (if any)
     const searchMatch = searchQuery 
@@ -35,13 +36,14 @@ export default function PlayerList() {
   const sortedPlayers = [...filteredPlayers].sort((a, b) => {
     if (sortBy === 'name') return a.name.localeCompare(b.name);
     if (sortBy === 'fees') return b.totalFees - a.totalFees;
-    return a.gamesPlayed - b.gamesPlayed;
+    return b.gamesPlayed - a.gamesPlayed; // Changed to sort by most games first
   });
   
   // Get status label
   const getStatusLabel = (player: typeof players[0]) => {
     if (player.currentlyPlaying) return 'Playing';
     if (player.inQueue) return 'In Queue';
+    if (player.donePlaying) return 'Inactive';
     return 'Available';
   };
   
@@ -49,6 +51,7 @@ export default function PlayerList() {
   const getStatusColor = (player: typeof players[0]) => {
     if (player.currentlyPlaying) return 'bg-blue-100 text-blue-800';
     if (player.inQueue) return 'bg-purple-100 text-purple-800';
+    if (player.donePlaying) return 'bg-gray-100 text-gray-800';
     return 'bg-green-100 text-green-800';
   };
   
@@ -101,6 +104,7 @@ export default function PlayerList() {
             <option value="available">Available</option>
             <option value="playing">Currently Playing</option>
             <option value="queued">In Queue</option>
+            <option value="done">Inactive</option>
           </select>
         </div>
         
@@ -172,33 +176,33 @@ export default function PlayerList() {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white divide-y divide-gray-200 capitalize">
               {sortedPlayers.map(player => (
-                <tr key={player.id} className='hover:bg-gray-100'>
-                  <td className="px-4 py-2 whitespace-nowrap">
+                <tr key={player.id} className={`hover:bg-gray-100`}>
+                  <td className={`px-4 py-2 whitespace-nowrap ${player.donePlaying && 'opacity-50'}`}>
                     {player.name}
                   </td>
-                  <td className="px-4 py-2 whitespace-nowrap">
+                  <td className={`px-4 py-2 whitespace-nowrap ${player.donePlaying && 'opacity-50'}`}>
                     <span className={`inline-block w-3 h-3 rounded-full mr-2 ${
                       player.skillLevel === 'beginner' ? 'bg-green-500' :
                       player.skillLevel === 'intermediate' ? 'bg-yellow-500' : 'bg-red-500'
                     }`}></span>
                     {player.skillLevel.charAt(0).toUpperCase() + player.skillLevel.slice(1)}
                   </td>
-                  <td className="px-4 py-2 whitespace-nowrap">
+                  <td className={`px-4 py-2 whitespace-nowrap ${player.donePlaying && 'opacity-50'}`}>
                     {player.gamesPlayed}
                   </td>
-                  <td className="px-4 py-2 whitespace-nowrap">
+                  <td className={`px-4 py-2 whitespace-nowrap ${player.donePlaying && 'opacity-50'}`}>
                     <span className={player.totalFees > 0 ? 'text-green-600 font-medium' : ''}>
                       {formatCurrency(player.totalFees, feeConfig.currency)}
                     </span>
                   </td>
-                  <td className="px-4 py-2 whitespace-nowrap">
+                  <td className={`px-4 py-2 whitespace-nowrap ${player.donePlaying && 'opacity-50'}`}>
                     <span className={player.unpaidFees > 0 ? 'text-red-600 font-medium' : ''}>
                       {formatCurrency(player.unpaidFees, feeConfig.currency)}
                     </span>
                   </td>
-                  <td className="px-4 py-2 whitespace-nowrap">
+                  <td className={`px-4 py-2 whitespace-nowrap`}>
                     <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(player)}`}>
                       {getStatusLabel(player)}
                     </span>

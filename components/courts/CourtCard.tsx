@@ -11,7 +11,27 @@ interface CourtCardProps {
 }
 
 export default function CourtCard({ court, players, onComplete }: CourtCardProps) {
-  const currentPlayers = players.filter(player => court.players.includes(player.id));
+  const [showDetails, setshowDetails] = useState(false);
+  const [isCompleteMatch, setisCompleteMatch] = useState(false);
+
+  const handleCompleteMatch = async () => {
+    setisCompleteMatch(true);
+
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    try {
+      await onComplete();
+    } catch (error) {
+      console.error('Error completing match:', error);
+    } finally {
+      setisCompleteMatch(false);
+    }
+  }
+
+  // Important: Preserve the exact order of players as in court.players array
+  const currentPlayers = court.players.map(playerId => 
+    players.find(player => player.id === playerId)
+  ).filter((player): player is Player => player !== undefined);
   
   // Add state for elapsed time
   const [elapsedTime, setElapsedTime] = useState({ minutes: 0, seconds: 0 });
@@ -48,15 +68,18 @@ export default function CourtCard({ court, players, onComplete }: CourtCardProps
   const formatPlayerVsDisplay = () => {
     if (court.isDoubles && currentPlayers.length === 4) {
       // Doubles: Team 1 (first 2 players) vs Team 2 (last 2 players)
+      const team1 = currentPlayers.slice(0, 2);
+      const team2 = currentPlayers.slice(2, 4);
+      
       return (
         <div className="mb-4 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
           <div className="flex items-center justify-between">
-            <div className="text-sm font-medium text-blue-800">
-              {currentPlayers[0].name} & {currentPlayers[1].name}
+            <div className="text-sm font-medium text-blue-800 capitalize">
+              {team1[0].name} & {team1[1].name}
             </div>
             <div className="text-xs px-2 py-1 bg-gray-200 text-[9px] rounded-full font-bold">VS</div>
-            <div className="text-sm font-medium text-red-800">
-              {currentPlayers[2].name} & {currentPlayers[3].name}
+            <div className="text-sm font-medium text-red-800 capitalize">
+              {team2[0].name} & {team2[1].name}
             </div>
           </div>
         </div>
@@ -66,11 +89,11 @@ export default function CourtCard({ court, players, onComplete }: CourtCardProps
       return (
         <div className="mb-4 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
           <div className="flex items-center justify-between">
-            <div className="text-sm font-medium text-blue-800">
+            <div className="text-sm font-medium text-blue-800 capitalize">
               {currentPlayers[0].name}
             </div>
             <div className="text-xs px-2 py-1 bg-gray-200 text-[9px] rounded-full font-bold">VS</div>
-            <div className="text-sm font-medium text-red-800">
+            <div className="text-sm font-medium text-red-800 capitalize">
               {currentPlayers[1].name}
             </div>
           </div>
@@ -86,7 +109,7 @@ export default function CourtCard({ court, players, onComplete }: CourtCardProps
   };
   
   return (
-    <div className={`relative z-1 p-4 h-full flex flex-col rounded-lg bg-[rgba(0,0,0,0.54)] min-h-[232px] border border-[#3d3131]
+    <div className={`relative z-1 p-4 h-full flex flex-col rounded-lg bg-[rgba(0,0,0,0.54)] min-h-[175px] sm:min-h-[232px] border border-[#3d3131]
       ${court.status === 'available' ? 'bg-[#262626]' : 'bg-amber-50'}`}>
       <div className="flex justify-between items-start mb-2">
         <h3 className={`text-[13px] font-bold ${court.status === 'available' ? 'text-white' : 'text-[#262626]'}`}>Court #{court.id}</h3>
@@ -99,44 +122,48 @@ export default function CourtCard({ court, players, onComplete }: CourtCardProps
         <>
           <div className="mb-2">
             <p className="text-sm font-medium">
-              Game Type: <span className="font-normal">{court.isDoubles ? 'Doubles' : 'Singles'}</span>
+              <span className="font-normal">Game Type:</span> {court.isDoubles ? 'Doubles' : 'Singles'}
             </p>
             <p className="text-sm font-medium">
-              Start Time: <span className="font-normal">{formatTime(court.startTime)}</span>
+              <span className="font-normal">Start Time:</span> {formatTime(court.startTime)}
             </p>
             
-            {/* Enhanced elapsed time display */}
-            <div className="mt-1">
-              <p className="text-sm font-medium">Elapsed Time: {formatTimeValue(elapsedTime.minutes)}:{formatTimeValue(elapsedTime.seconds)}</p>
-            </div>
+            <p className="text-sm font-medium">
+              <span className="font-normal">Elapsed Time:</span> {formatTimeValue(elapsedTime.minutes)}:{formatTimeValue(elapsedTime.seconds)}
+            </p>
           </div>
           
           {/* VS Display */}
           {formatPlayerVsDisplay()}
           
-          <div className="mb-3 hidden">
-            <h4 className="text-sm font-medium mb-1">All Players:</h4>
-            <ul className="text-sm pl-2">
-              {currentPlayers.map(player => (
-                <li key={player.id} className="mb-1 flex items-center">
-                  <span className="w-3 h-3 rounded-full mr-2" 
-                    style={{
-                      backgroundColor: 
-                        player.skillLevel === 'beginner' ? '#4ade80' :
-                        player.skillLevel === 'intermediate' ? '#facc15' : '#f87171'
-                    }}
-                  ></span>
-                  {player.name} - {player.skillLevel}
-                </li>
-              ))}
-            </ul>
-          </div>
+          {
+            showDetails && (
+              <div className="mb-3">
+                <h4 className="text-sm font-medium mb-1">All Players:</h4>
+                <ul className="text-sm pl-2">
+                  {currentPlayers.map(player => (
+                    <li key={player.id} className="mb-1 flex items-center">
+                      <span className="w-3 h-3 rounded-full mr-2" 
+                        style={{
+                          backgroundColor: 
+                            player.skillLevel === 'beginner' ? '#4ade80' :
+                            player.skillLevel === 'intermediate' ? '#facc15' : '#f87171'
+                        }}
+                      ></span>
+                      {player.name} - {player.skillLevel}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
           
           <button
-            onClick={onComplete}
+            onClick={handleCompleteMatch}
+            disabled={isCompleteMatch}
             className="mt-auto bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded text-sm cursor-pointer"
           >
-            Complete Match
+            {isCompleteMatch ? 'Completing...' : 'Complete Match'}
           </button>
         </>
       )}

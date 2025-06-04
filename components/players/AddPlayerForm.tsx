@@ -6,6 +6,7 @@ import { IoLogoOctocat } from "react-icons/io";
 import { FaShieldCat } from "react-icons/fa6";
 import { GiPocketBow } from "react-icons/gi";
 
+
 interface PlayerListProps {
   inModal?: boolean;
 }
@@ -15,9 +16,12 @@ export default function AddPlayerForm({ inModal = false }: PlayerListProps) {
   const [name, setName] = useState('');
   const [skillLevel, setSkillLevel] = useState<'beginner' | 'intermediate' | 'advanced'>('beginner');
   const [error, setError] = useState<string | null>(null);
+  const [isAdding, setIsAdding] = useState(false);
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    setIsAdding(true);
     
     // Trim the name to remove leading/trailing whitespace
     const trimmedName = name.trim();
@@ -43,8 +47,13 @@ export default function AddPlayerForm({ inModal = false }: PlayerListProps) {
     // Add the new player
     addNewPlayer(trimmedName, skillLevel);
     
-    // Reset the form
-    setName('');
+    setTimeout(() => {
+      setIsAdding(false);
+
+      // Reset the form
+      setName('');
+    }, 600);
+    
   };
   
   return (
@@ -60,7 +69,7 @@ export default function AddPlayerForm({ inModal = false }: PlayerListProps) {
               // Clear error when user starts typing again
               if (error) setError(null);
             }}
-            className={`w-full border ${error ? 'border-red-500' : 'border-gray-300'} rounded-md px-3 py-2 h-[36px] text-[14px]`}
+            className={`w-full border ${error ? 'border-red-500' : 'border-gray-300'} rounded-md px-3 py-2 h-[39px] text-[14px]`}
             placeholder="Enter player name"
           />
           {error && (
@@ -68,8 +77,8 @@ export default function AddPlayerForm({ inModal = false }: PlayerListProps) {
           )}
         </div>
         
-        <div>
-          <label className="block text-sm font-medium mb-1">
+        <div className='mb-5'>
+          <label className="block text-sm font-medium mb-1 text-gray-800">
             Skill Level
           </label>
           <div className="flex space-x-4">
@@ -123,9 +132,20 @@ export default function AddPlayerForm({ inModal = false }: PlayerListProps) {
         
         <button
           type="submit"
-          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded w-full cursor-pointer flex items-center justify-center transition"
+          disabled={isAdding}
         >
-          Add Player
+          {isAdding ? (
+            <>
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Adding player...
+            </>
+          ) : (
+            <>Add Player</>
+          )}
         </button>
       </form>
     </div>

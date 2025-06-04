@@ -7,12 +7,9 @@ import {
   loadAppState, 
   saveAppState, 
   resetAllData, 
-  resetCourts 
 } from '@/lib/localStorage';
 import {
   addPlayer,
-  assignPlayersToCourt,
-  markCourtAvailable,
   addToQueue,
   removeFromQueue,
   suggestNextMatch,
@@ -28,7 +25,6 @@ interface DataContextType {
   removePlayerFromQueue: (queueId: string) => void;
   getNextMatch: () => QueueItem | null;
   resetAll: () => void;
-  resetCourtsOnly: () => void;
   // Fee management functions
   updateFeeConfig: (newConfig: FeeConfig) => void;
   updatePlayerFees: (playerId: string, amount: number) => void;
@@ -328,11 +324,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   // Reset functions
   const resetAll = () => {
     resetAllData();
+    localStorage.removeItem('skipFeeWarning');
     setState(initialAppState);
-  };
-
-  const resetCourtsOnly = () => {
-    setState(currentState => resetCourts(currentState));
   };
 
   // This is for marking a single player
@@ -405,7 +398,6 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         removePlayerFromQueue,
         getNextMatch,
         resetAll,
-        resetCourtsOnly,
         // Fee management
         updateFeeConfig,
         updatePlayerFees,

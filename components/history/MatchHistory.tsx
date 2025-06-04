@@ -78,17 +78,17 @@ export default function MatchHistory() {
     
     if (match.isDoubles && matchPlayers.length === 4) {
       return (
-        <div className="flex items-center justify-center space-x-2">
+        <div className="flex items-center justify-between sm:justify-center space-x-2 capitalize">
           <span className="font-medium text-blue-800">{matchPlayers[0]?.name} & {matchPlayers[1]?.name}</span>
-          <span className="px-2 py-1 bg-gray-200 rounded-full text-xs font-bold">VS</span>
+          <span className="text-xs px-2 py-1 bg-gray-200 text-[9px] rounded-full font-bold">VS</span>
           <span className="font-medium text-red-800">{matchPlayers[2]?.name} & {matchPlayers[3]?.name}</span>
         </div>
       );
     } else if (!match.isDoubles && matchPlayers.length === 2) {
       return (
-        <div className="flex items-center justify-center space-x-2">
+        <div className="flex items-center justify-between sm:justify-center space-x-2 capitalize">
           <span className="font-medium text-blue-800">{matchPlayers[0]?.name}</span>
-          <span className="px-2 py-1 bg-gray-200 rounded-full text-xs font-bold">VS</span>
+          <span className="text-xs px-2 py-1 bg-gray-200 text-[9px] rounded-full font-bold">VS</span>
           <span className="font-medium text-red-800">{matchPlayers[1]?.name}</span>
         </div>
       );
@@ -103,10 +103,6 @@ export default function MatchHistory() {
   
   return (
     <div className="bg-white p-4 rounded-lg shadow-md mb-6">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Match History</h2>
-      </div>
-      
       {/* Filters and Search */}
       <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Search Box */}
@@ -224,7 +220,7 @@ export default function MatchHistory() {
                 </div>
                 
                 {/* Match Details */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                   <div className="bg-gray-50 p-2 rounded">
                     <div className="text-gray-500">Duration</div>
                     <div className="font-medium">{match.durationMinutes} minutes</div>
@@ -235,7 +231,7 @@ export default function MatchHistory() {
                     <div className="font-medium">Court #{match.courtId}</div>
                   </div>
       
-                  <div className="bg-gray-50 p-2 rounded">
+                  <div className="bg-gray-50 p-2 rounded hidden">
                     <div className="text-gray-500">Total Fees</div>
                     <div className="font-medium">
                       {formatCurrency(match.feesCharged, feeConfig.currency)}

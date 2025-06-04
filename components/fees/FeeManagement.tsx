@@ -86,7 +86,9 @@ export default function FeeManagement() {
           </div>
         </div>
       ) : (
-        <p className="text-gray-500 italic text-[12px] text-center">No outstanding payments</p>
+        <div className='p-4 bg-gray-50 rounded-md text-center'>
+          <p className="text-gray-500 italic text-center text-[12px] sm:text-sm">No outstanding payments</p>
+        </div>
       )}
     </div>
   );

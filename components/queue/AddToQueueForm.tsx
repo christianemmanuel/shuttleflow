@@ -2,24 +2,29 @@
 
 import React, { useState, useEffect } from 'react';
 import { useData } from '@/context/DataContext';
+import { LuUserSearch } from "react-icons/lu";
 
 export default function AddToQueueForm() {
   const { state, addPlayerToQueue, markPlayersAsDonePlaying } = useData();
   const { players, feeConfig } = state;
   
   const [selectedPlayers, setSelectedPlayers] = useState<string[]>([]);
-  const [gameType, setGameType] = useState<'singles' | 'doubles'>('singles');
+  const [gameType, setGameType] = useState<'singles' | 'doubles'>('doubles');
   const [showDonePlayers, setShowDonePlayers] = useState(false);
   
   // Modal state
   const [showFeeWarning, setShowFeeWarning] = useState(false);
   const [skipFeeWarning, setSkipFeeWarning] = useState(false);
+  // Player search state
+  const [search, setSearch] = useState('');
   
   // Load the skip warning preference from localStorage on component mount
   useEffect(() => {
     const skipWarning = localStorage.getItem('skipFeeWarning');
     if (skipWarning === 'true') {
       setSkipFeeWarning(true);
+    } else {
+      setSkipFeeWarning(false);
     }
   }, []);
   
@@ -28,6 +33,11 @@ export default function AddToQueueForm() {
     !player.currentlyPlaying && 
     !player.inQueue && 
     (showDonePlayers || !player.donePlaying)
+  );
+
+  // Filter by search
+  const filteredPlayers = availablePlayers.filter(player =>
+    player.name.toLowerCase().includes(search.trim().toLowerCase())
   );
   
   // Count players who are marked as done playing
@@ -39,6 +49,21 @@ export default function AddToQueueForm() {
   
   // Check if fee configuration is zero
   const hasFeeConfigured = feeConfig.singlesFee > 0 || feeConfig.doublesFee > 0;
+  
+  // Get team names based on player selection
+  const getTeamNames = () => {
+    const team1 = selectedPlayers.slice(0, 2).map(id => {
+      const player = players.find(p => p.id === id);
+      return player ? player.name : '';
+    });
+    
+    const team2 = selectedPlayers.slice(2, 4).map(id => {
+      const player = players.find(p => p.id === id);
+      return player ? player.name : '';
+    });
+    
+    return { team1, team2 };
+  };
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,6 +87,8 @@ export default function AddToQueueForm() {
   
   // Function to actually add players to queue (after fee warning if needed)
   const addToQueue = () => {
+    // For doubles, we want to preserve the team structure
+    // The order matters: first 2 players are Team 1, last 2 are Team 2
     addPlayerToQueue(selectedPlayers, gameType === 'doubles');
     setSelectedPlayers([]);
     setShowFeeWarning(false);
@@ -78,6 +105,7 @@ export default function AddToQueueForm() {
   
   const handlePlayerSelect = (playerId: string) => {
     if (selectedPlayers.includes(playerId)) {
+      // If removing a player, maintain team structure by removing from appropriate team
       setSelectedPlayers(selectedPlayers.filter(id => id !== playerId));
     } else {
       // Check if we're at the limit based on game type
@@ -86,6 +114,15 @@ export default function AddToQueueForm() {
         setSelectedPlayers([...selectedPlayers, playerId]);
       }
     }
+  };
+  
+  // Get which team a player belongs to (0 = none, 1 = team 1, 2 = team 2)
+  const getPlayerTeam = (playerId: string): number => {
+    if (!selectedPlayers.includes(playerId)) return 0;
+    
+    const index = selectedPlayers.indexOf(playerId);
+    if (index < 2) return 1;
+    return 2;
   };
   
   // Mark selected players as "done playing"
@@ -105,29 +142,12 @@ export default function AddToQueueForm() {
   
   return (
     <div className="bg-white p-4 rounded-lg shadow-md mb-5">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-bold">Add to Queue</h3>
-      </div>
-      
       <form onSubmit={handleSubmit}>
         {/* Game Type Selection */}
         <div className="mb-4 flex items-center">
-          <label className="block text-sm font-medium">Game Type</label>
+          <label className="block text-sm font-medium">Game play</label>
           <div className="flex space-x-3 ml-4">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="gameType"
-                checked={gameType === 'singles'}
-                onChange={() => {
-                  setGameType('singles');
-                  setSelectedPlayers([]); // Reset selected players
-                }}
-                className="mr-1"
-              />
-              Singles
-            </label>
-            <label className="flex items-center">
+            <label className={`flex items-center px-4 h-[32px] text-[12px] rounded cursor-pointer bg-gray-200 text-gray-600 ${gameType === 'doubles' && 'bg-green-200 text-green-800 font-bold'}`}>
               <input
                 type="radio"
                 name="gameType"
@@ -136,94 +156,117 @@ export default function AddToQueueForm() {
                   setGameType('doubles');
                   setSelectedPlayers([]); // Reset selected players
                 }}
-                className="mr-1"
+                className="hidden"
               />
               Doubles
+            </label>
+
+            <label className={`flex items-center px-4 h-[32px] text-[12px] rounded cursor-pointer bg-gray-200 text-gray-600 ${gameType === 'singles' && 'bg-green-200 text-green-800 font-bold'}`}>
+              <input
+                type="radio"
+                name="gameType"
+                checked={gameType === 'singles'}
+                onChange={() => {
+                  setGameType('singles');
+                  setSelectedPlayers([]); // Reset selected players
+                }}
+                className="hidden"
+              />
+              Singles
             </label>
           </div>
         </div>
         
-        {/* Show/Hide Done Players Toggle */}
         {donePlayersCount > 0 && (
           <div className="mb-3 p-2 bg-gray-50 rounded-md">
-            <label className="flex items-center text-sm">
+            <label className="flex items-center text-sm cursor-pointer">
               <input
                 type="checkbox"
                 checked={showDonePlayers}
                 onChange={() => {
                   setShowDonePlayers(!showDonePlayers);
-                  setSelectedPlayers([]); // Reset selections when changing filter
+                  setSelectedPlayers([]);
                 }}
-                className="mr-2"
+                className="sr-only" // hides the default checkbox
               />
-              Show players marked as "done playing" ({donePlayersCount} players)
+              
+              {/* Custom toggle switch */}
+              <div className={`relative w-[32px] h-[20px] rounded-full mr-2 transition-colors duration-200 ease-in-out ${showDonePlayers ? 'bg-blue-500' : 'bg-gray-300'}`}>
+                <div className={`absolute w-[16px] h-[16px] bg-white rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${showDonePlayers ? 'translate-x-[13px]' : 'translate-x-[2.5px]'}`} style={{ top: '2px' }}></div>
+              </div>
+              
+              <span>Show players marked as "done playing" ({donePlayersCount} players)</span>
             </label>
           </div>
         )}
 
+        {/* Search Player Form */}
+        <div className="mb-4 relative">
+          <LuUserSearch className="absolute left-3 text-[16px] top-[10.5px] text-gray-500" />
+          <input
+            type="text"
+            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 pl-8"
+            placeholder="Search player by name..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+        </div>
         
         {/* Player Selection */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-2">
-            Select Players ({selectedPlayers.length}/{gameType === 'singles' ? 2 : 4})
-          </label>
-          
-          {availablePlayers.length === 0 ? (
+        <div className="mb-4">          
+          {filteredPlayers.length === 0 ? (
             <div className="p-4 bg-gray-50 rounded-md text-center">
-              <p className="text-gray-500 italic">No available players found</p>
-              {!showDonePlayers && donePlayersCount > 0 && (
-                <button
-                  type="button"
-                  onClick={() => setShowDonePlayers(true)}
-                  className="mt-2 text-blue-500 text-sm hover:text-blue-700"
-                >
-                  Show players marked as "done playing"
-                </button>
-              )}
+              <p className="text-gray-500 italic text-[12px] sm:text-sm">No available players found</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-              {availablePlayers.map(player => (
-                <div 
-                  key={player.id}
-                  onClick={() => handlePlayerSelect(player.id)}
-                  className={`p-2 border rounded-md cursor-pointer
-                    ${selectedPlayers.includes(player.id) 
-                      ? 'bg-blue-100 border-blue-300' 
-                      : 'hover:bg-gray-100'
-                    } 
-                    ${player.donePlaying ? 'border-l-4 border-l-gray-400 bg-gray-50' : ''}`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <span className="w-3 h-3 rounded-full mr-2" 
-                        style={{
-                          backgroundColor: 
-                            player.skillLevel === 'beginner' ? '#4ade80' :
-                            player.skillLevel === 'intermediate' ? '#facc15' : '#f87171'
-                        }}
-                      ></span>
-                      <span className={player.donePlaying ? 'text-gray-500' : ''}>
-                        {player.name}
-                      </span>
+              {filteredPlayers.map(player => {
+                const teamNumber = getPlayerTeam(player.id);
+                const teamColor = teamNumber === 1 ? 'bg-blue-100 border-blue-300' : 
+                                  teamNumber === 2 ? 'bg-red-100 border-red-300' : '';
+                
+                return (
+                  <div 
+                    key={player.id}
+                    onClick={() => handlePlayerSelect(player.id)}
+                    className={`px-2 py-1.5 border rounded-md cursor-pointer capitalize
+                      ${teamColor}
+                      ${!selectedPlayers.includes(player.id) && 'hover:bg-gray-100'} 
+                      ${player.donePlaying ? 'bg-gray-50 pointer-events-none border-gray-300' : ''}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <span className="w-2 sm:w-3 h-2 sm:h-3 rounded-full mr-1.5 sm:mr-2" 
+                          style={{
+                            backgroundColor: 
+                              player.skillLevel === 'beginner' ? '#4ade80' :
+                              player.skillLevel === 'intermediate' ? '#facc15' : '#f87171'
+                          }}
+                        ></span>
+                        <span className={player.donePlaying ? 'text-gray-500' : ''}>
+                          {player.name}
+                        </span>
+                      </div>
+                      
+                      {player.donePlaying && (
+                        <div className="flex items-center">
+                          <span className="text-xs bg-gray-200 text-gray-700 px-1 py-0.5 rounded">
+                            Done
+                          </span>
+                        </div>
+                      )}
                     </div>
-                    
-                    {player.donePlaying && (
-                      <span className="text-xs bg-gray-200 text-gray-700 px-1 py-0.5 rounded">
-                        Done
-                      </span>
-                    )}
+                    <div className="text-xs text-gray-500 ml-3.5 sm:ml-5">
+                      Games: {player.gamesPlayed}
+                    </div>
                   </div>
-                  <div className="text-xs text-gray-500 ml-5">
-                    Games: {player.gamesPlayed}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
         
-        <div className="flex space-x-2">
+        <div className="flex">
           <button
             type="submit"
             disabled={
@@ -231,7 +274,7 @@ export default function AddToQueueForm() {
               (gameType === 'singles' && selectedPlayers.length !== 2) || 
               (gameType === 'doubles' && selectedPlayers.length !== 4)
             }
-            className="bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="w-full md:w-auto bg-purple-500 hover:bg-purple-600 text-white h-[42px] px-5 rounded disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             Add to Queue
           </button>
@@ -242,7 +285,7 @@ export default function AddToQueueForm() {
             disabled={selectedPlayers.length === 0}
             className="text-red-500 py-2 px-4 rounded disabled:text-gray-300 disabled:cursor-not-allowed ml-auto"
           >
-            Exit Game
+            Done playing
           </button>
         </div>
       </form>

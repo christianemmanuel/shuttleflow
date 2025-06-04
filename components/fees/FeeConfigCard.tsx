@@ -54,7 +54,7 @@ export default function FeeConfigCard() {
             onClick={() => setIsEditing(true)}
             className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded text-sm"
           >
-            Edit
+            Edit fees
           </button>
         )}
       </div>
