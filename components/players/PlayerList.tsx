@@ -97,7 +97,7 @@ export default function PlayerList() {
           <label className="block text-xs text-gray-500 mb-1">Filter by Status</label>
           <select
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value as any)}
+            onChange={(e) => setFilterStatus(e.target.value as 'all' | 'available' | 'playing' | 'queued' | 'done')}
             className="w-full border rounded-md px-3 py-2"
           >
             <option value="all">All Players</option>
@@ -113,7 +113,7 @@ export default function PlayerList() {
           <label className="block text-xs text-gray-500 mb-1">Sort By</label>
           <select
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
+            onChange={(e) => setSortBy(e.target.value as 'name' | 'games' | 'fees')}
             className="w-full border rounded-md px-3 py-2"
           >
             <option value="name">Name</option>

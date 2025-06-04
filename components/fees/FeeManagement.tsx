@@ -6,7 +6,7 @@ import { formatCurrency } from '@/lib/utils';
 
 export default function FeeManagement() {
   const { state, markFeesAsPaid } = useData();
-  const { players, gameSessions, feeConfig } = state;
+  const { players, feeConfig } = state;
   
   // Calculate total revenue
   const totalRevenue = players.reduce((sum, player) => sum + player.totalFees, 0);

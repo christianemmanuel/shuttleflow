@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Player, Court, QueueItem, AppState } from '@/types';
+import { Player, QueueItem, AppState } from '@/types';
 
 // Generate a unique ID
 export const generateId = (): string => uuidv4();

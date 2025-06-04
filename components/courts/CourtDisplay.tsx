@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import CourtCard from './CourtCard';
 import { useData } from '@/context/DataContext';
 

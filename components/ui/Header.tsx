@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useData } from '@/context/DataContext';
-import { SlSettings } from "react-icons/sl";
 import { GiShuttlecock } from "react-icons/gi";
 import Modal from '@/components/ui/Modal';
 import useModal from '@/hooks/useModal';

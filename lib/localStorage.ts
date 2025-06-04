@@ -1,7 +1,7 @@
 import { AppState } from '@/types';
 
 // Save data to localStorage
-export const saveToLocalStorage = (key: string, data: any): void => {
+export const saveToLocalStorage = <T>(key: string, data: T): void => {
   if (typeof window !== 'undefined') {
     localStorage.setItem(key, JSON.stringify(data));
   }

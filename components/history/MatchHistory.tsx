@@ -135,11 +135,11 @@ export default function MatchHistory() {
         </div>
         
         {/* Date Filter */}
-        <div>
+        <div className='hidden'>
           <label className="block text-xs text-gray-500 mb-1">Filter by Date</label>
           <select
             value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value as any)}
+            onChange={(e) => setDateFilter(e.target.value as 'all' | 'today' | 'week')}
             className="w-full border rounded-md px-3 py-2"
           >
             <option value="all">All Time</option>
@@ -149,11 +149,11 @@ export default function MatchHistory() {
         </div>
         
         {/* Sort Options */}
-        <div>
+        <div className='hidden'>
           <label className="block text-xs text-gray-500 mb-1">Sort By</label>
           <select
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
+            onChange={(e) => setSortBy(e.target.value as 'recent' | 'oldest' | 'duration')}
             className="w-full border rounded-md px-3 py-2"
           >
             <option value="recent">Most Recent</option>

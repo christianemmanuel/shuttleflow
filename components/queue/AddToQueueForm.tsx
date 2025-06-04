@@ -195,7 +195,7 @@ export default function AddToQueueForm() {
                 <div className={`absolute w-[16px] h-[16px] bg-white rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${showDonePlayers ? 'translate-x-[13px]' : 'translate-x-[2.5px]'}`} style={{ top: '2px' }}></div>
               </div>
               
-              <span>Show players marked as "done playing" ({donePlayersCount} players)</span>
+              <span>Show players marked as &quot;done playing&quot; ({donePlayersCount} players)</span>
             </label>
           </div>
         )}
@@ -312,7 +312,7 @@ export default function AddToQueueForm() {
                   className="mr-2"
                   onChange={(e) => setSkipFeeWarning(e.target.checked)}
                 />
-                Don't show this warning again
+                Don&apos;t show this warning again
               </label>
             </div>
             

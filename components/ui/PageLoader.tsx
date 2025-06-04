@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import Lottie from 'lottie-react';
 
+type LottieAnimationData = Record<string, unknown>;
+
 interface PageLoaderProps {
   show: boolean;
   onFinished?: () => void;
@@ -16,7 +18,7 @@ export default function PageLoader({
 }: PageLoaderProps) {
   const [opacity, setOpacity] = useState(1);
   const [visible, setVisible] = useState(show);
-  const [lottieData, setLottieData] = useState<any>(null);
+  const [lottieData, setLottieData] = useState<LottieAnimationData | null>(null);
 
   // Load the Lottie animation
   useEffect(() => {

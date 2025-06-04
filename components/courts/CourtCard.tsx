@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Court, Player } from '@/types';
-import { formatTime, formatCurrency } from '@/lib/utils';
+import { formatTime } from '@/lib/utils';
 
 interface CourtCardProps {
   court: Court;
@@ -26,6 +26,8 @@ export default function CourtCard({ court, players, onComplete }: CourtCardProps
     } finally {
       setisCompleteMatch(false);
     }
+
+    setshowDetails(false)
   }
 
   // Important: Preserve the exact order of players as in court.players array
