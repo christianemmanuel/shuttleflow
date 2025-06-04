@@ -50,21 +50,6 @@ export default function AddToQueueForm() {
   // Check if fee configuration is zero
   const hasFeeConfigured = feeConfig.singlesFee > 0 || feeConfig.doublesFee > 0;
   
-  // Get team names based on player selection
-  const getTeamNames = () => {
-    const team1 = selectedPlayers.slice(0, 2).map(id => {
-      const player = players.find(p => p.id === id);
-      return player ? player.name : '';
-    });
-    
-    const team2 = selectedPlayers.slice(2, 4).map(id => {
-      const player = players.find(p => p.id === id);
-      return player ? player.name : '';
-    });
-    
-    return { team1, team2 };
-  };
-  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
