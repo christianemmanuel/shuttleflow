@@ -7,7 +7,7 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background-color: #df2027; /* Fallback color */
+  background-color: rgb(var(--foreground-rgb)); /* Fallback color */
   background-image: linear-gradient(to bottom, rgba(0, 0, 0, .8), rgba(176, 35, 35, .6)), url("/leechingwei2.jpg"); /* Gradient layered with image */
   background-size: cover;
   background-position: center;
@@ -15,6 +15,16 @@ body {
   background-attachment: fixed;
   font-size: 14px;
   overflow-x: hidden;
+}
+
+@media (max-width: 639px) {
+  body {
+    background-position: left;
+  }
+}
+
+input, select, textarea {
+  font-size: 14px !important;
 }
 
 .badminton-court-card {
@@ -84,6 +94,7 @@ background-size: contain;
 }
 
 /* Toast animations */
+/* Toast animations */
 @keyframes toast-slide-in {
   0% {
     transform: translateX(100%);
@@ -106,8 +117,28 @@ background-size: contain;
   }
 }
 
+@keyframes toast-bounce {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10px);
+  }
+  50% {
+    transform: translateX(7px);
+  }
+  75% {
+    transform: translateX(-4px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
 .toast-enter {
-  animation: toast-slide-in 0.3s ease-out forwards;
+  animation: 
+    toast-slide-in 0.3s ease-out forwards,
+    toast-bounce 0.5s ease-out 0.3s forwards;
 }
 
 .toast-exit {

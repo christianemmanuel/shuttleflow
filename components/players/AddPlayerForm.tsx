@@ -78,7 +78,7 @@ export default function AddPlayerForm({ inModal = false, onPlayerAdded }: Player
               // Clear error when user starts typing again
               if (error) setError(null);
             }}
-            className={`w-full border ${error ? 'border-red-500' : 'border-gray-300'} rounded-md px-3 py-2 h-[39px] text-[14px]`}
+            className={`w-full border ${error ? 'border-red-500' : 'border-gray-300'} rounded-md px-3 py-2 h-[42px] text-[14px]`}
             placeholder="Enter player name"
           />
           {error && (

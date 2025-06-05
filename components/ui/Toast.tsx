@@ -66,7 +66,7 @@ export default function Toast({ toast }: ToastProps) {
 
   return (
     <div
-      className={`flex items-center justify-between p-3.5 mb-3 rounded-md ${isExiting ? 'toast-exit' : 'toast-enter'} ${getToastBgColor()}`}
+      className={`flex items-center justify-between p-4 mb-3 rounded-md ${isExiting ? 'toast-exit' : 'toast-enter'} ${getToastBgColor()}`}
       role="alert"
     >
       <div className="flex items-center">

@@ -95,30 +95,44 @@ export default function PlayerList() {
         <div className='flex flex-row justify-between gap-3 md:mt-0 mt-3 md:mb-0 mb-2'>
           <div className='w-full'>
             <label className="block text-xs text-gray-500 mb-1">Filter by Status</label>
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value as 'all' | 'available' | 'playing' | 'queued' | 'done')}
-              className="w-full border rounded-md px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 h-[38px]"
-            >
-              <option value="all">All Players</option>
-              <option value="available">Available</option>
-              <option value="playing">Currently Playing</option>
-              <option value="queued">In Queue</option>
-              <option value="done">Inactive</option>
-            </select>
+            <div className="relative">
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value as 'all' | 'available' | 'playing' | 'queued' | 'done')}
+                className="w-full appearance-none border rounded-md px-2 py-2 pl-3 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 h-[38px]"
+              >
+                <option value="all">All Players</option>
+                <option value="available">Available</option>
+                <option value="playing">Currently Playing</option>
+                <option value="queued">In Queue</option>
+                <option value="done">Inactive</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 text-gray-700">
+                <svg className="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                  <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                </svg>
+              </div>
+            </div>
           </div>
           
           <div className='w-full'>
             <label className="block text-xs text-gray-500 mb-1">Sort By</label>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as 'name' | 'games' | 'fees')}
-              className="w-full border rounded-md px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 h-[38px]"
-            >
-              <option value="name">Name</option>
-              <option value="games">Games Played</option>
-              <option value="fees">Total Fees</option>
-            </select>
+            <div className="relative">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as 'name' | 'games' | 'fees')}
+                className="w-full appearance-none border rounded-md px-2 py-2 pl-3 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 h-[38px]"
+              >
+                <option value="name">Name</option>
+                <option value="games">Games Played</option>
+                <option value="fees">Total Fees</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 text-gray-700">
+                <svg className="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                  <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                </svg>
+              </div>
+            </div>
           </div>
         </div>
         
