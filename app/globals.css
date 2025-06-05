@@ -44,11 +44,11 @@ background-size: contain;
   left: 0;
 }
 .court-sideline-left {
-    left: 50%;
-    transform: translateX(-50%);
+    left: 10%;
 }
 .net-court-line {
-    left: 10%;
+    left: 50%;
+    transform: translateX(-50%);
 }
 .court-sideline-right {
     right: 10%;
@@ -58,6 +58,14 @@ background-size: contain;
 }
 .court-bottomline {
   bottom: 15%;
+}
+@media (max-width: 639px) {
+  .court-sideline-left {
+    left: 8%;
+  }
+  .court-sideline-right {
+    right: 8%;
+  }
 }
 
 
@@ -72,4 +80,35 @@ background-size: contain;
   100% {
     transform:translateX(-17px);
   }
+}
+
+/* Toast animations */
+@keyframes toast-slide-in {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toast-slide-out {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.toast-enter {
+  animation: toast-slide-in 0.3s ease-out forwards;
+}
+
+.toast-exit {
+  animation: toast-slide-out 0.3s ease-out forwards;
 }

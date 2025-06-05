@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { useData } from '@/context/DataContext';
+import { useToast } from '@/context/ToastContext';
+
 import { IoLogoOctocat } from "react-icons/io";
 import { FaShieldCat } from "react-icons/fa6";
 import { GiPocketBow } from "react-icons/gi";
@@ -13,6 +15,7 @@ interface PlayerListProps {
 
 export default function AddPlayerForm({ inModal = false, onPlayerAdded }: PlayerListProps) {
   const { state, addNewPlayer } = useData();
+  const { showToast } = useToast();
   const [name, setName] = useState('');
   const [skillLevel, setSkillLevel] = useState<'beginner' | 'intermediate' | 'advanced'>('beginner');
   const [error, setError] = useState<string | null>(null);
@@ -52,6 +55,8 @@ export default function AddPlayerForm({ inModal = false, onPlayerAdded }: Player
     setTimeout(() => {
       setIsAdding(false);
 
+      showToast(`${trimmedName} added successfully!`, 'success');
+
       // Reset the form
       setName('');
 
@@ -82,12 +87,12 @@ export default function AddPlayerForm({ inModal = false, onPlayerAdded }: Player
         </div>
         
         <div className='mb-5'>
-          <label className="block text-sm font-medium mb-1 text-gray-800">
+          <label className="block text-sm mb-2 text-gray-800">
             Skill Level
           </label>
-          <div className="flex space-x-4 sm:flex-row flex-col sm:gap-0 gap-1.5">
+          <div className="flex space-x-4 sm:flex-row flex-col sm:gap-0 gap-2">
             <label
-              className={`flex items-center px-4 py-1.5 rounded cursor-pointer w-full justify-center 
+              className={`flex items-center px-4 py-2 rounded cursor-pointer w-full justify-center 
                 ${skillLevel === 'beginner' ? 'bg-green-200 text-green-800' : 'bg-gray-100'}
               `}
             >
@@ -102,7 +107,7 @@ export default function AddPlayerForm({ inModal = false, onPlayerAdded }: Player
             </label>
 
             <label
-              className={`flex items-center px-4 py-1.5 rounded cursor-pointer w-full justify-center 
+              className={`flex items-center px-4 py-2 rounded cursor-pointer w-full justify-center 
                 ${skillLevel === 'intermediate' ? 'bg-yellow-200 text-yellow-800' : 'bg-gray-100'}
               `}
             >
@@ -117,7 +122,7 @@ export default function AddPlayerForm({ inModal = false, onPlayerAdded }: Player
             </label>
 
             <label
-              className={`flex items-center px-4 py-1.5 rounded cursor-pointer w-full justify-center 
+              className={`flex items-center px-4 py-2 rounded cursor-pointer w-full justify-center 
                 ${skillLevel === 'advanced' ? 'bg-red-200 text-red-800' : 'bg-gray-100'}
               `}
             >
@@ -136,8 +141,8 @@ export default function AddPlayerForm({ inModal = false, onPlayerAdded }: Player
         
         <button
           type="submit"
-          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded w-full cursor-pointer flex items-center justify-center transition relative
-             border-b-[3px] border-b-blue-700 hover:border-b-blue-800 active:border-b-blue-900 active:translate-y-[1px]"
+          className="bg-blue-500 hover:bg-blue-600 text-white py-2.5 px-4 rounded w-full cursor-pointer flex items-center justify-center transition relative
+             border-b-[4px] border-b-blue-700 hover:border-b-blue-800 active:border-b-blue-900 active:translate-y-[2px]"
           disabled={isAdding}
         >
           {isAdding ? (

@@ -10,7 +10,7 @@ import { MdPersonAdd } from "react-icons/md";
 import React, { useState } from 'react';
 import { useData } from '@/context/DataContext';
 
-const Page = () => {
+const Queue = () => {
   const { state } = useData();
   const { queue, players } = state;
   
@@ -40,7 +40,7 @@ const Page = () => {
 
       <button
         onClick={addPlayerModal.openModal}
-        className="fixed w-[55px] h-[55px] z-10 bottom-[15px] mb-4 shadow-2xl right-[20px] bg-blue-500 hover:bg-blue-600 cursor-pointer text-[22px] text-white rounded-[50px] flex items-center justify-center"
+        className="fixed w-[55px] h-[55px] z-10 bottom-[15px] mb-4 shadow-lg right-[20px] bg-blue-500 hover:bg-blue-600 cursor-pointer text-[22px] text-white rounded-[50px] flex items-center justify-center"
       >
         <MdPersonAdd/>
       </button>
@@ -58,7 +58,7 @@ const Page = () => {
       </Modal>
       
       {/* Custom Tab Menu - Updated with third tab */}
-      <div className="flex border-b bg-white p-1 h-[40px] rounded-md justify-between items-center mb-0">
+      <div className="flex border-b bg-white p-1 h-[42px] rounded-md justify-between items-center mb-0">
         <button
           className={`h-full sm:px-3 px-1.5 sm:text-sm text-[13px] focus:outline-none flex items-center gap-1.5 w-full cursor-pointer text-center justify-center ${
             activeTab === 'players' 
@@ -101,4 +101,4 @@ const Page = () => {
   )
 }
 
-export default Page;
+export default Queue;

@@ -111,7 +111,7 @@ export default function CourtCard({ court, players, onComplete }: CourtCardProps
   };
   
   return (
-    <div className={`relative z-1 sm:p-4 p-3 h-full flex flex-col rounded-lg bg-[rgba(0,0,0,0.54)] min-h-[175px] sm:min-h-[232px] border border-[#3d3131]
+    <div className={`relative z-1 sm:p-4 p-3 h-full flex flex-col rounded-lg bg-[rgba(0,0,0,0.54)] min-h-[195px] sm:min-h-[232px] border border-[#3d3131]
       ${court.status === 'available' ? 'bg-[#262626]' : 'bg-amber-50'}`}>
       <div className="flex justify-between items-start mb-2">
         <h3 className={`text-[13px] font-bold ${court.status === 'available' ? 'text-white' : 'text-[#262626]'}`}>Court #{court.id}</h3>

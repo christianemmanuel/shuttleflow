@@ -3,6 +3,8 @@
 import Header from '@/components/ui/Header';
 import { DataProvider } from '@/context/DataContext';
 import { LoaderProvider } from '@/context/LoaderContext';
+import { ToastProvider } from '@/context/ToastContext';
+import { ToastContainer } from '@/components/ui/Toast';
 import PageLoader from '@/components/ui/PageLoader';
 import { useLoader } from '@/context/LoaderContext';
 
@@ -16,6 +18,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
       <main className="mx-auto py-6">
         {children}
       </main>
+      <ToastContainer />
     </>
   );
 }
@@ -26,10 +29,12 @@ export default function ClientLayout({
   children: React.ReactNode;
 }) {
   return (
-    <LoaderProvider>
-      <DataProvider>
-        <AppContent>{children}</AppContent>
-      </DataProvider>
-    </LoaderProvider>
+    <ToastProvider>
+      <LoaderProvider>
+        <DataProvider>
+          <AppContent>{children}</AppContent>
+        </DataProvider>
+      </LoaderProvider>
+    </ToastProvider>
   );
 }

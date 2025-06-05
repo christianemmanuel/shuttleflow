@@ -47,7 +47,7 @@ export default function QueueDisplay() {
         <div className="mb-5">
           <div className="flex items-center justify-center mt-2 mb-3 ">
             <div className="text-center sm:px-3 sm:py-2 p-1.5 bg-blue-50 rounded-md border border-blue-100 w-full">
-              <div className="flex items-center justify-between capitalize sm:flex-row flex-col sm:gap-0.5 gap-2.5">
+              <div className="flex items-center justify-between capitalize sm:flex-row flex-row sm:gap-0.5 gap-2.5">
                 <div className="text-sm font-medium text-blue-800">
                   {team1[0].name} & {team1[1].name}
                 </div>
@@ -66,7 +66,7 @@ export default function QueueDisplay() {
         <div className="mb-5">
           <div className="flex items-center justify-center mt-2 mb-3">
             <div className="text-center sm:px-3 sm:py-2 p-1.5 bg-blue-50 rounded-md border border-blue-100 w-full">
-              <div className="flex items-center justify-between capitalize sm:flex-row flex-col">
+              <div className="flex items-center justify-between capitalize sm:flex-row flex-row">
                 <div className="text-sm font-medium text-blue-800">
                   {queuedPlayers[0].name}
                 </div>
