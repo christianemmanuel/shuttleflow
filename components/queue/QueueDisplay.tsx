@@ -3,11 +3,20 @@
 import React from 'react';
 import { useData } from '@/context/DataContext';
 import { formatTime } from '@/lib/utils';
-import { Player } from '@/types';
+import { Player, Court, QueueItem as QueueItemType } from '@/types'; // Make sure these types are defined in your types file
 import { useToast } from '@/context/ToastContext';
 import useModal from '@/hooks/useModal';
 import Modal from '@/components/ui/Modal';
 import { GiShuttlecock } from "react-icons/gi";
+
+
+interface QueueItemProps {
+  queueItem: QueueItemType;
+  index: number;
+  availableCourts: Court[];
+  onAssignMatch: (queueId: string, playerIds: string[], courtId?: number) => void;
+  onRemoveFromQueue: (queueId: string) => void;
+}
 
 // New QueueItem component that manages its own modal
 const QueueItem = ({ 
@@ -16,13 +25,7 @@ const QueueItem = ({
   availableCourts,
   onAssignMatch,
   onRemoveFromQueue 
-}: {
-  queueItem: any;
-  index: number;
-  availableCourts: any[];
-  onAssignMatch: (queueId: string, playerIds: string[], courtId?: number) => void;
-  onRemoveFromQueue: (queueId: string) => void;
-}) => {
+}: QueueItemProps ) => {
   const alertModal = useModal();
   const { showToast } = useToast();
   const { players } = useData().state;
@@ -117,7 +120,7 @@ const QueueItem = ({
       <div className="flex flex-col sm:flex-row gap-2">
         <div className="flex-1">
           <label className="block text-[14px] text-gray-800 font-medium mb-2">
-            Let's Play - Assign a Court:
+            Let&apos;s Play - Assign a Court:
           </label>
           <div className="flex flex-wrap gap-2">
             {availableCourts.map(court => (
