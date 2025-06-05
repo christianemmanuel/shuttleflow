@@ -15,7 +15,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
     <>
       <PageLoader show={isLoading} onFinished={hideLoader} message={message} />
       <Header />
-      <main className="mx-auto py-6">
+      <main className="mx-auto py-6 md:pb-6 pb-17">
         {children}
       </main>
       <ToastContainer />

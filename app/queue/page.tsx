@@ -31,7 +31,7 @@ const Queue = () => {
     <div className='space-y-8 px-3 sm:px-4'>
       {(availablePlayers.length - donePlayers.length) === 0 && (
         <>
-          <div className="fixed z-10 bottom-[10px] right-[85px] py-1.5 px-2.5 bg-gray-900 text-sm text-white rounded-[6px] flex items-center justify-center bounce-animate">
+          <div className="fixed z-10 bottom-[70px] md:bottom-[10px] right-[85px] py-1.5 px-2.5 bg-gray-900 text-sm text-white rounded-[6px] flex items-center justify-center bounce-animate">
             Add Player
             <div className="absolute right-[-6px] top-1/2 -translate-y-1/2 w-0 h-0 border-y-8 border-y-transparent border-l-8 border-l-gray-900"></div>
           </div>
@@ -40,7 +40,7 @@ const Queue = () => {
 
       <button
         onClick={addPlayerModal.openModal}
-        className="fixed w-[55px] h-[55px] z-10 bottom-[15px] mb-4 shadow-lg right-[20px] bg-blue-500 hover:bg-blue-600 cursor-pointer text-[22px] text-white rounded-[50px] flex items-center justify-center"
+        className="fixed w-[55px] h-[55px] z-10 bottom-[75px] md:bottom-[15px] mb-4 shadow-lg right-[20px] bg-blue-500 hover:bg-blue-600 cursor-pointer text-[22px] text-white rounded-[50px] flex items-center justify-center"
       >
         <MdPersonAdd/>
       </button>

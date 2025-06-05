@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Court, Player } from '@/types';
 import { formatTime } from '@/lib/utils';
+import { useToast } from '@/context/ToastContext';
 
 interface CourtCardProps {
   court: Court;
@@ -13,6 +14,8 @@ interface CourtCardProps {
 export default function CourtCard({ court, players, onComplete }: CourtCardProps) {
   const [showDetails, setshowDetails] = useState(false);
   const [isCompleteMatch, setisCompleteMatch] = useState(false);
+
+  const { showToast } = useToast();
 
   const handleCompleteMatch = async () => {
     setisCompleteMatch(true);
@@ -25,6 +28,7 @@ export default function CourtCard({ court, players, onComplete }: CourtCardProps
       console.error('Error completing match:', error);
     } finally {
       setisCompleteMatch(false);
+      showToast('Well Played!', 'success', 3000);
     }
 
     setshowDetails(false)

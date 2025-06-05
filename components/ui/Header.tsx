@@ -8,12 +8,20 @@ import Modal from '@/components/ui/Modal';
 import useModal from '@/hooks/useModal';
 import { RiResetLeftFill } from "react-icons/ri";
 import { useLoader } from '@/context/LoaderContext';
+import { FaListUl } from "react-icons/fa6";
+import { GiMoneyStack } from "react-icons/gi";
+import { usePathname } from 'next/navigation';
 
 export default function Header() {
   const { resetAll } = useData();
   const { showLoader } = useLoader();
   const resetAllModal = useModal();
   const [isResetting, setIsResetting] = useState(false);
+
+  const pathname = usePathname();
+
+  // Helper function to determine if link is active
+  const isActive = (path: string) => pathname === path;
   
   // Handle reset all data
   const handleResetAll = () => {
@@ -32,7 +40,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="bg-[#df2027] text-white py-2 px-4">
+      <header className="bg-[#df2027] text-white py-2 px-4 md:block hidden">
         <div className="mx-auto flex flex-col sm:flex-row justify-between items-center">
           <h1 className="text-[1.05em] font-bold mb-2 sm:mb-0 flex items-center">
             <Link href='/' className='flex items-center gap-[0.15rem]'>ShuttleFlow <GiShuttlecock className='rotate-[205deg]' /></Link>
@@ -55,6 +63,57 @@ export default function Header() {
             >
               <RiResetLeftFill className='transition hover:-rotate-90 cursor-pointer' />
             </button>
+          </nav>
+        </div>
+      </header>
+
+      <header className="bg-[#ffffff] text-white py-2.5 px-4 md:hidden block fixed bottom-0 left-0 right-0 z-9 shadow-[inset_0_4px_6px_-1px_rgba(0,0,0,0.1)]">
+        <div className="mx-auto flex flex-col sm:flex-row justify-between items-center">
+          <nav className="flex items-center space-x-3 justify-around w-full">
+            <Link 
+              href="/" 
+              className={`mx-3 px-2 flex justify-between items-center flex-col gap-1 rounded-md text-sm font-medium transition ${
+                isActive('/') 
+                  ? 'text-red-500 hover:bg-red-100' 
+                  : 'text-gray-500 hover:bg-gray-100'
+              }`}
+            >
+              <GiShuttlecock size="1.4rem"/>
+              <span>Court</span>
+            </Link>
+            
+            <Link 
+              href="/queue" 
+              className={`mx-3 px-2 flex justify-between items-center flex-col gap-1 rounded-md text-sm font-medium transition ${
+                isActive('/queue') 
+                  ? 'text-red-500 hover:bg-red-100' 
+                  : 'text-gray-500 hover:bg-gray-100'
+              }`}
+            >
+              <FaListUl size="1.4rem"/>
+              <span>Queue</span>
+            </Link>
+            
+            <Link 
+              href="/fees" 
+              className={`mx-3 px-2 flex justify-between items-center flex-col gap-1 rounded-md text-sm font-medium transition ${
+                isActive('/fees') 
+                  ? 'text-red-500 hover:bg-red-100' 
+                  : 'text-gray-500 hover:bg-gray-100'
+              }`}
+            >
+              <GiMoneyStack size="1.4rem"/>
+              <span>Fees</span>
+            </Link>
+
+            <Link 
+              href="" 
+              onClick={resetAllModal.openModal}
+              className={`mx-3 px-2 flex justify-between items-center flex-col gap-1 rounded-md text-sm font-medium transition text-gray-500 hover:bg-gray-100`}
+            >
+              <GiMoneyStack size="1.4rem"/>
+              <span>Reset</span>
+            </Link>
           </nav>
         </div>
       </header>

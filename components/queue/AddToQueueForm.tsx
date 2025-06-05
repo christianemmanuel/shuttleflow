@@ -29,6 +29,7 @@ export default function AddToQueueForm() {
   const [search, setSearch] = useState('');
 
   const alertModal = useModal();
+  const alertModalDonePlay = useModal();
   
   // Load the skip warning preference from localStorage on component mount
   useEffect(() => {
@@ -68,7 +69,6 @@ export default function AddToQueueForm() {
     // Check if we have the right number of players
     if ((gameType === 'singles' && selectedPlayers.length !== 2) || 
         (gameType === 'doubles' && selectedPlayers.length !== 4)) {
-      console.log('Di ko alam ');
       alertModal.openModal()
       return;
     }
@@ -138,6 +138,9 @@ export default function AddToQueueForm() {
     
     // Reset selected players
     setSelectedPlayers([]);
+
+    alertModalDonePlay.closeModal();
+    showToast('Remove player successfully', 'info');
   };
   
   return (
@@ -164,10 +167,10 @@ export default function AddToQueueForm() {
             </div>
 
             {/* Game Type Selection */}
-            <div className="mb-4 flex items-center">
-              <label htmlFor="doubles" className="text-[13px] text-gray-600 block mr-3 whitespace-nowrap">Game type</label>
+            <div className="mb-5 flex items-center">
+              <label htmlFor="doubles" className="text-[13px] text-gray-600 block mr-3 whitespace-nowrap">Game type:</label>
               <div className="flex space-x-3 ml-0 sm:ml-4 gap-3 w-full sm:w-auto">
-                <label className={`flex items-center mr-0 px-5 h-[32px] text-[12px] gap-[.25rem] rounded cursor-pointer bg-gray-200 text-gray-600 w-full sm:w-auto justify-center ${gameType === 'doubles' && '!bg-[#e74c3c] text-white font-bold'}`}>
+                <label className={`flex items-center mr-0 px-5 h-[34px] text-[12px] gap-[.25rem] rounded cursor-pointer bg-gray-200 text-gray-600 w-full sm:w-auto justify-center border-b-[2px] border-b-gray-300 ${gameType === 'doubles' && '!bg-[#e74c3c] text-white font-bold border-b-red-700'}`}>
                   <input
                     type="radio"
                     name="gameType"
@@ -182,7 +185,7 @@ export default function AddToQueueForm() {
                   {gameType === 'doubles' ? <MdRadioButtonChecked size={`1.2em`} />  : <MdRadioButtonUnchecked size={`1.2em`} /> } <span>Doubles</span>
                 </label>
 
-                <label htmlFor="singles" className={`flex items-center px-5 h-[32px] text-[12px] gap-[.25rem] rounded cursor-pointer bg-gray-200 text-gray-600 w-full sm:w-auto justify-center ${gameType === 'singles' && '!bg-[#e74c3c] text-white font-bold'}`}>
+                <label htmlFor="singles" className={`flex items-center px-5 h-[34px] text-[12px] gap-[.25rem] rounded cursor-pointer bg-gray-200 text-gray-600 w-full sm:w-auto justify-center border-b-[2px] border-b-gray-300 ${gameType === 'singles' && '!bg-[#e74c3c] text-white font-bold border-b-red-700'}`}>
                   <input
                     type="radio"
                     name="gameType"
@@ -201,7 +204,7 @@ export default function AddToQueueForm() {
           
             {donePlayersCount > 0 && (
               <div className="mb-3 p-2 bg-gray-50 rounded-md">
-                <label className="flex items-center text-sm cursor-pointer">
+                <label className="flex items-center text-[13px] text-gray-500 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={showDonePlayers}
@@ -234,10 +237,10 @@ export default function AddToQueueForm() {
                     <div 
                       key={player.id}
                       onClick={() => handlePlayerSelect(player.id)}
-                      className={`px-2 py-1.5 border rounded-md cursor-pointer capitalize
+                      className={`px-2 py-1.5 border rounded-md cursor-pointer capitalize shadow-md
                         ${teamColor}
                         ${!selectedPlayers.includes(player.id) && 'hover:bg-gray-100'} 
-                        ${player.donePlaying ? 'bg-gray-50 pointer-events-none border-gray-300' : ''}`}
+                        ${player.donePlaying ? 'bg-gray-50 pointer-events-none border-gray-300 shadow-none' : ''}`}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
@@ -281,13 +284,38 @@ export default function AddToQueueForm() {
 
               <button
                 type="button"
-                onClick={handleDonePlaying}
+                onClick={alertModalDonePlay.openModal}
                 disabled={selectedPlayers.length === 0}
                 className="text-gray-500 py-1 px-2 rounded disabled:text-gray-300 disabled:cursor-not-allowed"
               >
                 Done playing
               </button>
             </div>
+
+            <Modal
+              isOpen={alertModalDonePlay.isOpen}
+              onClose={alertModalDonePlay.closeModal}
+              maxWidth="md"
+              showCloseButton={false}
+            >
+              <div className="overflow-y-auto flex items-center">
+                Are you sure you want to remove {selectedPlayers.length === 1 ? 'this' : 'those'} player?
+              </div>
+              <div className="flex justify-end mt-4">
+                <button
+                  onClick={alertModalDonePlay.closeModal}
+                  className="bg-gray-200 hover:bg-gray-400 text-gray-600 py-1.5 px-3 rounded mr-2"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDonePlaying}
+                  className="bg-[#e74c3c] text-white py-1.5 px-3 rounded"
+                >
+                  Confirm
+                </button>
+              </div>
+            </Modal>
 
             <Modal
               isOpen={alertModal.isOpen}
@@ -306,10 +334,10 @@ export default function AddToQueueForm() {
       {/* Fee Warning Modal */}
       {showFeeWarning && (
         <div className="fixed inset-0 bg-black/75 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-4 sm:p-6 mx-4">
-            <div className="flex items-start mb-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-4 sm:p-6 sm:mx-4 mx-3">
+            <div className="flex mb-4 items-center">
               <div className="flex-shrink-0 mr-2 sm:mr-3">
-                <TbAlertTriangle className='text-amber-500 mt-[.25rem] sm:mt-0' size={`1.3rem`} />
+                <TbAlertTriangle className='text-amber-500' size={`1.3rem`} />
               </div>
               <div>
                 <h3 className="text-md font-medium text-gray-900">Fees not set. Add players with no charges?</h3>
@@ -327,7 +355,7 @@ export default function AddToQueueForm() {
               </label>
             </div>
             
-            <div className="mt-4 flex justify-end space-x-3">
+            <div className="sm:mt-4 mt-7 flex justify-end space-x-3">
               <button
                 type="button"
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded"

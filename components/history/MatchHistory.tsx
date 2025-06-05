@@ -80,7 +80,7 @@ export default function MatchHistory() {
     
     if (match.isDoubles && matchPlayers.length === 4) {
       return (
-        <div className="text-center sm:px-3 sm:py-2 p-1.5 bg-blue-50 rounded-md border border-blue-100 w-full flex items-center justify-between space-x-2 capitalize">
+        <div className="text-center sm:px-3 sm:py-2 p-2.5 bg-blue-50 rounded-md border border-blue-100 w-full flex items-center justify-between space-x-2 capitalize">
           <span className="font-medium text-blue-800">{matchPlayers[0]?.name} & {matchPlayers[1]?.name}</span>
           <span className="text-xs px-2 py-1 bg-gray-200 text-[9px] rounded-full font-bold">VS</span>
           <span className="font-medium text-red-800">{matchPlayers[2]?.name} & {matchPlayers[3]?.name}</span>
@@ -88,7 +88,7 @@ export default function MatchHistory() {
       );
     } else if (!match.isDoubles && matchPlayers.length === 2) {
       return (
-        <div className="text-center sm:px-3 sm:py-2 p-1.5 bg-blue-50 rounded-md border border-blue-100 w-full flex items-center justify-between space-x-2 capitalize">
+        <div className="text-center sm:px-3 sm:py-2 p-2.5 bg-blue-50 rounded-md border border-blue-100 w-full flex items-center justify-between space-x-2 capitalize">
           <span className="font-medium text-blue-800">{matchPlayers[0]?.name}</span>
           <span className="text-xs px-2 py-1 bg-gray-200 text-[9px] rounded-full font-bold">VS</span>
           <span className="font-medium text-red-800">{matchPlayers[1]?.name}</span>
@@ -194,8 +194,8 @@ export default function MatchHistory() {
       ) : (
         <div className="space-y-4">
           {sortedHistory.map((match, index) => (
-            <div key={match.id} className="border rounded-lg overflow-hidden">
-              <div className="bg-gray-50 px-4 py-2 flex justify-between items-center">
+            <div key={match.id} className="border rounded-lg overflow-hidden shadow-md">
+              <div className="bg-gray-50 px-3 py-2 flex justify-between items-center">
                 <div className="flex items-center">
                   <span className="font-bold text-gray-700 mr-2">#{matchHistory.length - index}</span>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -209,14 +209,14 @@ export default function MatchHistory() {
                 </div>
               </div>
               
-              <div className="p-4">
+              <div className="p-3">
                 {/* Players */}
                 <div className="mb-3">
                   {formatPlayersVs(match)}
                 </div>
                 
                 {/* Match Details */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                <div className="grid grid-cols-2 sm:grid-cols-2 gap-2 text-sm">
                   <div className="bg-blue-50 rounded-md border border-blue-100 p-2">
                     <div className="text-gray-500">Duration</div>
                     <div className="font-medium">{match.durationMinutes} minutes</div>
