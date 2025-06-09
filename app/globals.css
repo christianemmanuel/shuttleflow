@@ -29,7 +29,7 @@ input, select, textarea {
 
 .badminton-court-card {
   background-image: url("/badminton-linev2.png");
-background-size: contain; 
+  background-size: contain; 
   background-position: center;
   background-repeat: no-repeat;
   width: 100%;

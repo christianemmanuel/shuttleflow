@@ -5,8 +5,10 @@ import Link from 'next/link';
 import { GiShuttlecock } from "react-icons/gi";
 import { FaListUl } from "react-icons/fa6";
 import { GiMoneyStack } from "react-icons/gi";
+import { GrMoney } from "react-icons/gr";
 import { FiSettings } from "react-icons/fi";
 import { usePathname } from 'next/navigation';
+import { BsPersonLinesFill } from "react-icons/bs";
 
 export default function Header() {
   const pathname = usePathname();
@@ -26,7 +28,7 @@ export default function Header() {
             <Link href="/" className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition ${isActive('/') && 'text-white bg-red-700'}`}>
               Court
             </Link>
-            <Link href="/queue" className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition ${isActive('/queue') && 'text-white bg-red-700'}`}>
+            <Link href="/players" className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition ${isActive('/players') && 'text-white bg-red-700'}`}>
               Queue
             </Link>
             <Link href="/fees" className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition ${isActive('/fees') && 'text-white bg-red-700'}`}>
@@ -55,15 +57,15 @@ export default function Header() {
             </Link>
             
             <Link 
-              href="/queue" 
+              href="/players" 
               className={`mx-3 px-2 flex justify-between items-center flex-col gap-1 rounded-md text-[13px] font-medium transition ${
-                isActive('/queue') 
+                isActive('/players') 
                   ? 'text-red-500 hover:bg-red-100' 
                   : 'text-gray-400 hover:bg-gray-100'
               }`}
             >
-              <FaListUl size="1.3rem"/>
-              <span>Queue</span>
+              <BsPersonLinesFill size="1.4rem"/>
+              <span>Players</span>
             </Link>
             
             <Link 
@@ -74,7 +76,7 @@ export default function Header() {
                   : 'text-gray-400 hover:bg-gray-100'
               }`}
             >
-              <GiMoneyStack size="1.3rem"/>
+              <GrMoney size="1.2rem"/>
               <span>Fees</span>
             </Link>
 

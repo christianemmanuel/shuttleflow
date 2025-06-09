@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Court, Player } from '@/types';
 import { formatTime } from '@/lib/utils';
 import { useToast } from '@/context/ToastContext';
+import { IoPersonAddSharp } from "react-icons/io5";
 
 interface CourtCardProps {
   court: Court;
@@ -173,11 +175,17 @@ export default function CourtCard({ court, players, onComplete }: CourtCardProps
           </button>
         </>
       )}
-      
       {court.status === 'available' && (
         <>
-          <div className="flex items-center justify-center h-full ">
-            <p className="text-gray-500 text-sm mb-4">Available for play 🏸</p>
+          <div className="flex items-center justify-center flex-col mt-[20px] sm:mt-[32px]">
+            <p className="text-gray-500 text-sm mb-4">Add players to start the game</p>
+            <Link href='/players'
+              type="submit"
+              className="bg-blue-500 text-[13px] hover:bg-blue-600 text-white gap-1.5 py-1.5 px-3 rounded w-auto cursor-pointer flex items-center justify-center transition relative
+                border-b-[4px] border-b-blue-700 hover:border-b-blue-800 active:border-b-blue-900 active:translate-y-[2px]"
+            >
+              <><IoPersonAddSharp /> Add Players</>
+            </Link>
           </div>
 
           <div className='court-sideline-left'></div>

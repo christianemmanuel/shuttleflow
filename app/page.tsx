@@ -60,7 +60,7 @@ const Home = () => {
             inModal={true} 
             onPlayerAdded={() => {
               addPlayerModal.closeModal();
-              router.push('/queue');
+              router.push('/players');
             }} 
           />
         </div>

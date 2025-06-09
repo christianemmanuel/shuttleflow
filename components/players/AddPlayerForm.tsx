@@ -3,10 +3,7 @@
 import React, { useState } from 'react';
 import { useData } from '@/context/DataContext';
 import { useToast } from '@/context/ToastContext';
-
-import { IoLogoOctocat } from "react-icons/io";
-import { FaShieldCat } from "react-icons/fa6";
-import { GiPocketBow } from "react-icons/gi";
+import { MdPersonAdd } from "react-icons/md";
 
 interface PlayerListProps {
   inModal?: boolean;
@@ -78,7 +75,7 @@ export default function AddPlayerForm({ inModal = false, onPlayerAdded }: Player
               // Clear error when user starts typing again
               if (error) setError(null);
             }}
-            className={`w-full border ${error ? 'border-red-500' : 'border-gray-300'} rounded-md px-3 py-2 h-[42px] text-[14px]`}
+            className={`w-full border ${error ? 'border-red-500' : 'border-gray-400'} rounded-md px-3 py-2 h-[42px] text-[14px]`}
             placeholder="Enter player name"
           />
           {error && (
@@ -86,14 +83,14 @@ export default function AddPlayerForm({ inModal = false, onPlayerAdded }: Player
           )}
         </div>
         
-        <div className='mb-5'>
-          <label className="block text-sm mb-2 text-gray-800">
-            Skill Level
+        <div className='mb-4'>
+          <label className="block text-[13px] mb-2 text-gray-800">
+            Skill Level:
           </label>
-          <div className="flex space-x-4 sm:flex-row flex-col sm:gap-0 gap-2">
+          <div className="flex flex-row sm:gap-0 gap-2">
             <label
-              className={`flex items-center px-4 py-2 rounded cursor-pointer w-full justify-center 
-                ${skillLevel === 'beginner' ? 'bg-green-200 text-green-800' : 'bg-gray-100'}
+              className={`flex items-center px-4 py-2 rounded-[50px] cursor-pointer w-full justify-center text-[12px] border-b-[2px] border-b-gray-200 
+                ${skillLevel === 'beginner' ? 'bg-green-200 text-green-800 border-b-green-600' : 'bg-gray-100'}
               `}
             >
               <input
@@ -103,12 +100,12 @@ export default function AddPlayerForm({ inModal = false, onPlayerAdded }: Player
                 onChange={() => setSkillLevel('beginner')}
                 className="hidden"
               />
-              <IoLogoOctocat className='mr-2' /> Beginner
+              Beginner
             </label>
 
             <label
-              className={`flex items-center px-4 py-2 rounded cursor-pointer w-full justify-center 
-                ${skillLevel === 'intermediate' ? 'bg-yellow-200 text-yellow-800' : 'bg-gray-100'}
+              className={`flex items-center px-4 py-2 rounded-[50px] cursor-pointer w-full justify-center text-[12px] border-b-[2px] border-b-gray-200
+                ${skillLevel === 'intermediate' ? 'bg-yellow-200 text-yellow-800 border-b-yellow-600' : 'bg-gray-100'}
               `}
             >
               <input
@@ -118,12 +115,12 @@ export default function AddPlayerForm({ inModal = false, onPlayerAdded }: Player
                 onChange={() => setSkillLevel('intermediate')}
                 className="hidden"
               />
-              <FaShieldCat className='mr-2' /> Intermediate
+              Intermediate
             </label>
 
             <label
-              className={`flex items-center px-4 py-2 rounded cursor-pointer w-full justify-center 
-                ${skillLevel === 'advanced' ? 'bg-red-200 text-red-800' : 'bg-gray-100'}
+              className={`flex items-center px-4 py-2 rounded-[50px] cursor-pointer w-full justify-center text-[12px] border-b-[2px] border-b-gray-200
+                ${skillLevel === 'advanced' ? 'bg-red-200 text-red-800 border-b-red-600' : 'bg-gray-100'}
               `}
             >
               <input
@@ -133,7 +130,7 @@ export default function AddPlayerForm({ inModal = false, onPlayerAdded }: Player
                 onChange={() => setSkillLevel('advanced')}
                 className="hidden"
               />
-              <GiPocketBow className='mr-2' /> Advanced
+              Advanced
             </label>
           </div>
 
@@ -141,7 +138,7 @@ export default function AddPlayerForm({ inModal = false, onPlayerAdded }: Player
         
         <button
           type="submit"
-          className="bg-blue-500 hover:bg-blue-600 text-white py-2.5 px-4 rounded w-full cursor-pointer flex items-center justify-center transition relative
+          className="bg-blue-500 hover:bg-blue-600 text-white py-2.5 px-4 rounded w-full cursor-pointer flex gap-1.5 items-center justify-center transition relative
              border-b-[4px] border-b-blue-700 hover:border-b-blue-800 active:border-b-blue-900 active:translate-y-[2px]"
           disabled={isAdding}
         >
@@ -154,7 +151,7 @@ export default function AddPlayerForm({ inModal = false, onPlayerAdded }: Player
               Adding player...
             </>
           ) : (
-            <>Add Player</>
+            <><MdPersonAdd size={`1.1rem`} /> Add Player</>
           )}
         </button>
       </form>

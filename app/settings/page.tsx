@@ -33,14 +33,14 @@ const Settings = () => {
         <div className="bg-white p-4 rounded-lg shadow-md mb-5">
           <h3 className="text-lg font-bold mb-4">Settings</h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2.5">
+          <div className="grid grid-cols-1 max-w-[600px] gap-4 mb-2.5">
             <div className="bg-gray-100 p-4 rounded-lg flex items-center justify-between">
               <p className="text-sm text-gray-800">Reset All Data</p>
               <button onClick={resetAllModal.openModal} type="submit" className="bg-red-500 hover:bg-red-600 text-white py-1 px-4 h-[34px] min-w-[87px] rounded-md cursor-pointer flex items-center justify-center transition relative w-auto">Reset all</button>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2.5">
+          <div className="grid grid-cols-1 max-w-[600px] gap-4 mb-2.5">
             <div className="bg-gray-100 p-4 rounded-lg flex items-center justify-between">
               <p className="text-sm text-gray-800">Terms of Use</p>
               <button type="submit" className="bg-gray-500 hover:bg-gray-600 text-white py-1 px-4 h-[34px] min-w-[87px] rounded-md cursor-pointer flex items-center justify-center transition relative w-auto">View</button>
