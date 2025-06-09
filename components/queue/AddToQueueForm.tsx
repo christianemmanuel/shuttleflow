@@ -48,10 +48,6 @@ export default function AddToQueueForm() {
     !player.inQueue && 
     (showDonePlayers || !player.donePlaying)
   );
-  
-  const donePlayers = players.filter(player => 
-    player.donePlaying
-  );
 
   // Filter by search
   const filteredPlayers = availablePlayers.filter(player =>
