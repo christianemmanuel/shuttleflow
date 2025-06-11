@@ -12,6 +12,7 @@ import { TbAlertTriangle } from "react-icons/tb";
 import { FaListUl } from "react-icons/fa";
 import { MdOutlineRadioButtonUnchecked } from "react-icons/md";
 import { MdOutlineRadioButtonChecked } from "react-icons/md";
+import { CgSearch } from "react-icons/cg";
 
 import AddPlayerForm from '@/components/players/AddPlayerForm';
 
@@ -94,7 +95,7 @@ export default function AddToQueueForm() {
     setSelectedPlayers([]);
     setShowFeeWarning(false);
 
-    showToast(`Smash time! ${queue.length + 1} ${queue.length + 1 > 1 ? 'matches' : 'match'} waiting!`, 'success', 4000);
+    showToast(`Smash time! ${queue.length + 1} ${queue.length + 1 > 1 ? 'matches' : 'match'} waiting!`, 'success', 2500);
   };
   
   // Handle confirming the fee warning
@@ -161,16 +162,18 @@ export default function AddToQueueForm() {
               )}
 
               {/* Search Player Form */}
-              <div className="mb-3 relative">
-                <LuUserSearch className="absolute left-3 text-[16px] top-[11.5px] text-gray-500" />
-                <input
-                  type="text"
-                  className="w-full border border-gray-400 h-[42px] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 pl-8"
-                  placeholder={`Search players`}
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                />
-              </div>
+              {availablePlayers.length >= 2 && (
+                <div className="mb-3 relative">
+                  <CgSearch className="absolute left-3 text-[16px] top-[14px] text-gray-500" />
+                  <input
+                    type="text"
+                    className="w-full border border-gray-400 h-[42px] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 pl-8"
+                    placeholder={`Search Players (${availablePlayers.length} Available)`}
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                  />
+                </div>
+              )}
             </>
           )}
           
@@ -320,8 +323,8 @@ export default function AddToQueueForm() {
               <div className="flex space-x-4 sm:flex-row justify-between flex-col sm:gap-0 gap-2 pt-0 sm:pt-2">
                 <button
                   type="submit"
-                  className="bg-blue-500 hover:bg-blue-600 text-white py-2.5 px-5 rounded-md cursor-pointer flex gap-1.5 items-center justify-center transition relative
-              border-b-[4px] border-b-blue-700 hover:border-b-blue-800 active:border-b-blue-900 active:translate-y-[2px] w-full sm:w-auto"
+                  disabled={selectedPlayers.length === 0}
+                  className={`text-white py-2.5 px-5 rounded-md cursor-pointer flex gap-1.5 items-center justify-center transition relative border-b-[4px] active:translate-y-[2px] w-full sm:w-auto ${(gameType === 'singles' && selectedPlayers.length !== 2) || (gameType === 'doubles' && selectedPlayers.length !== 4) ? 'bg-gray-400 border-b-gray-500' : 'bg-blue-500 hover:bg-blue-600 border-b-blue-700 hover:border-b-blue-800 active:border-b-blue-900'}`}
                 >
                   <FaListUl /> Add to Queue
                 </button>

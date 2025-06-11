@@ -71,16 +71,16 @@ const QueueItem = ({
       return (
         <div className="mb-5">
           <div className="flex items-center justify-center mt-2 mb-3 ">
-            <div className="text-center sm:px-3 sm:py-2 py-3 px-2.5 bg-white rounded-md border border-gray-300 w-full">
+            <div className="text-center sm:px-3 sm:py-2 py-2 px-2.5 bg-white rounded-md border border-gray-300 w-full">
               <div className="flex items-center justify-between capitalize sm:flex-row flex-row sm:gap-0.5 gap-2.5">
-                <div className="text-sm font-medium text-blue-800">
-                  {team1[0].name} {team1[0].currentlyPlaying && <span className="text-xs text-red-500 ml-1">(Playing)</span>} & 
-                  {team1[1].name} {team1[1].currentlyPlaying && <span className="text-xs text-red-500 ml-1">(Playing)</span>}
+                <div className="text-sm font-medium text-blue-800 text-left">
+                  <span className='block'>{team1[0].name} {team1[0].currentlyPlaying && <span className="text-xs text-red-500 ml-1">(Playing)</span>}</span>
+                  <span className='block mt-1'>{team1[1].name} {team1[1].currentlyPlaying && <span className="text-xs text-red-500 ml-1">(Playing)</span>}</span>
                 </div>
                 <div className="text-xs px-2 py-1 bg-gray-200 text-[9px] rounded-full font-bold uppercase">vs</div>
-                <div className="text-sm font-medium text-green-800">
-                  {team2[0].name} {team2[0].currentlyPlaying && <span className="text-xs text-red-500 ml-1">(Playing)</span>} & 
-                  {team2[1].name} {team2[1].currentlyPlaying && <span className="text-xs text-red-500 ml-1">(Playing)</span>}
+                <div className="text-sm font-medium text-green-800 text-left">
+                  <span className='block'>{team2[0].name} {team2[0].currentlyPlaying && <span className="text-xs text-red-500 ml-1">(Playing)</span>}</span>
+                  <span className='block mt-1'>{team2[1].name} {team2[1].currentlyPlaying && <span className="text-xs text-red-500 ml-1">(Playing)</span>}</span>
                 </div>
               </div>
             </div>

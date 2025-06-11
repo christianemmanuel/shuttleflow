@@ -1,7 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useData } from '@/context/DataContext';
+import { loadFromLocalStorage, saveToLocalStorage } from '@/lib/localStorage';
+
 import { GiShuttlecock } from "react-icons/gi";
 import { GrMoney } from "react-icons/gr";
 import { FiSettings } from "react-icons/fi";
@@ -10,9 +13,38 @@ import { BsPersonLinesFill } from "react-icons/bs";
 
 export default function Header() {
   const pathname = usePathname();
+  const { state } = useData();
+  
+  // State to control whether the court notification should be shown
+  const [showCourtNotification, setShowCourtNotification] = useState(false);
 
   // Helper function to determine if link is active
   const isActive = (path: string) => pathname === path;
+  
+  // Helper function to check if any court has players
+  const arePlayersOnCourt = () => {
+    return state.courts.some(court => court.status === 'occupied' && court.players.length > 0);
+  };
+  
+  // Load notification preference and check court status on mount and when courts change
+  useEffect(() => {
+    const hideCourtNotification = loadFromLocalStorage('hideCourtNotification', false);
+    
+    // Only show notification if there are players on court AND the user hasn't dismissed it
+    if (arePlayersOnCourt() && !hideCourtNotification) {
+      setShowCourtNotification(true);
+    } else {
+      setShowCourtNotification(false);
+    }
+  }, [state.courts]); // Re-run when courts state changes
+  
+  // Handle click on the Court link
+  const handleCourtLinkClick = () => {
+    if (showCourtNotification) {
+      setShowCourtNotification(false);
+      saveToLocalStorage('hideCourtNotification', true);
+    }
+  };
 
   return (
     <>
@@ -23,7 +55,11 @@ export default function Header() {
           </h1>
           
           <nav className="flex items-center space-x-3">
-            <Link href="/" className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition ${isActive('/') && 'text-white bg-red-700'}`}>
+            <Link 
+              href="/" 
+              className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition ${isActive('/') && 'text-white bg-red-700'}`}
+              onClick={handleCourtLinkClick}
+            >
               Court
             </Link>
             <Link href="/players" className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition ${isActive('/players') && 'text-white bg-red-700'}`}>
@@ -44,19 +80,28 @@ export default function Header() {
           <nav className="flex items-center space-x-3 justify-around w-full">
             <Link 
               href="/" 
-              className={`mx-3 px-2 flex justify-between items-center flex-col gap-1 rounded-md text-[13px] font-medium transition ${
+              className={`mx-3 px-2 flex justify-between items-center flex-col gap-1 rounded-md text-[12px] font-medium transition relative ${
                 isActive('/') 
                   ? 'text-red-500 hover:bg-red-100' 
                   : 'text-gray-400 hover:bg-gray-100'
               }`}
+              onClick={handleCourtLinkClick}
             >
+              
+              {showCourtNotification && (
+                <span className='absolute text-[13px] text-white whitespace-nowrap bottom-14 left-0 py-2 px-3 bg-red-500 rounded-md animate-bounce shadow shadow-gray-700'>
+                  Players are now on court
+                  <div className="absolute top-[40px] left-5 -translate-y-1/2 w-0 h-0 border-y-9 rotate-90 border-y-transparent border-l-9 border-l-red-500"></div>
+                </span>
+              )}
+
               <GiShuttlecock size="1.3rem"/>
               <span>Court</span>
             </Link>
             
             <Link 
               href="/players" 
-              className={`mx-3 px-2 flex justify-between items-center flex-col gap-1 rounded-md text-[13px] font-medium transition ${
+              className={`mx-3 px-2 flex justify-between items-center flex-col gap-1 rounded-md text-[12px] font-medium transition ${
                 isActive('/players') 
                   ? 'text-red-500 hover:bg-red-100' 
                   : 'text-gray-400 hover:bg-gray-100'
@@ -68,7 +113,7 @@ export default function Header() {
             
             <Link 
               href="/fees" 
-              className={`mx-3 px-2 flex justify-between items-center flex-col gap-1 rounded-md text-[13px] font-medium transition ${
+              className={`mx-3 px-2 flex justify-between items-center flex-col gap-1 rounded-md text-[12px] font-medium transition ${
                 isActive('/fees') 
                   ? 'text-red-500 hover:bg-red-100' 
                   : 'text-gray-400 hover:bg-gray-100'
@@ -80,7 +125,7 @@ export default function Header() {
 
             <Link 
               href="/settings" 
-              className={`mx-3 px-2 flex justify-between items-center flex-col gap-1 rounded-md text-[13px] font-medium transition ${
+              className={`mx-3 px-2 flex justify-between items-center flex-col gap-1 rounded-md text-[12px] font-medium transition ${
                 isActive('/settings') 
                   ? 'text-red-500 hover:bg-red-100' 
                   : 'text-gray-400 hover:bg-gray-100'

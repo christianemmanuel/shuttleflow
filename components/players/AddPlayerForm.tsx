@@ -54,7 +54,7 @@ export default function AddPlayerForm({ inModal = false, onPlayerAdded }: Player
     setTimeout(() => {
       setIsAdding(false);
 
-      showToast(`${trimmedName} added successfully!`, 'success');
+      showToast(`${trimmedName} added successfully!`, 'success', 2500);
 
       // Reset the form
       setName('');
@@ -140,9 +140,9 @@ export default function AddPlayerForm({ inModal = false, onPlayerAdded }: Player
         
         <button
           type="submit"
-          className="bg-blue-500 hover:bg-blue-600 text-white py-2.5 px-4 rounded w-full cursor-pointer flex gap-1.5 items-center justify-center transition relative
-             border-b-[4px] border-b-blue-700 hover:border-b-blue-800 active:border-b-blue-900 active:translate-y-[2px]"
-          disabled={isAdding}
+          className={`text-white py-2.5 px-4 rounded w-full cursor-pointer flex gap-1.5 items-center justify-center transition relative
+             border-b-[4px] active:translate-y-[2px] ${name.trim() === '' || isAdding ? 'bg-gray-400 border-b-gray-500' : 'bg-blue-500 hover:bg-blue-600 border-b-blue-700 hover:border-b-blue-800 active:border-b-blue-900'}`}
+          disabled={name.trim() === '' || isAdding}
         >
           {isAdding ? (
             <>

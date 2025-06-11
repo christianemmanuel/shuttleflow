@@ -260,7 +260,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       const newQueueItem: QueueItem = {
         id: generateId(),
         playerIds,
-        requestedTime: new Date().getTime().toString(),
+        requestedTime: new Date().toISOString(),
         isDoubles
       };
       
@@ -367,6 +367,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const resetAll = () => {
     resetAllData();
     localStorage.removeItem('skipFeeWarning');
+    localStorage.removeItem('hideQueueNotification');
+    localStorage.removeItem('hideCourtNotification');
     setState(initialAppState);
   };
 
