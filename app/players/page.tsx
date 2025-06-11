@@ -3,13 +3,12 @@
 import AddToQueueForm from '@/components/queue/AddToQueueForm';
 import QueueDisplay from '@/components/queue/QueueDisplay';
 import MatchHistory from '@/components/history/MatchHistory'; // Import your MatchHistory component
-import useModal from '@/hooks/useModal';
 import React, { useState } from 'react';
 import { useData } from '@/context/DataContext';
 
 const Queue = () => {
   const { state } = useData();
-  const { queue, players } = state;
+  const { queue } = state;
   
   // Add 'history' to the possible tab states
   const [activeTab, setActiveTab] = useState<'players' | 'queue' | 'history'>('players');
