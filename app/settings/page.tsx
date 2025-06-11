@@ -55,6 +55,11 @@ const Settings = () => {
               <Link href='https://tally.so/r/n9g4Y4' target='_blank' className="bg-red-500 hover:bg-red-600 text-white py-1 px-4 h-[34px] min-w-[87px] rounded-md cursor-pointer flex items-center justify-center transition relative w-auto">Give Feedback</Link>
             </div>
           </div>
+
+          <div className='mt-8 text-center text-gray-500 text-xs flex flex-col gap-1'>
+            <span>Created by: Ian Concepcion</span>
+            <span>Website: <Link href='https://www.ianconcepcion.dev/' target='_blank'>ianconcepcion.dev</Link></span>
+          </div>
           
         </div>
       </div>
