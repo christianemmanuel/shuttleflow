@@ -263,7 +263,7 @@ export default function QueueDisplay() {
       
       if (result.success) {
         removePlayerFromQueue(queueId);
-        showToast(`Match assigned to Court ${courtId}`, 'success', 3500);
+        showToast(`Match assigned to Court ${courtId}`, 'success', 2500);
       }
       // Error case is handled in the QueueItem component with the warning modal
     } else {

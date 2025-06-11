@@ -80,7 +80,7 @@ export default function CourtCard({ court, players, onComplete }: CourtCardProps
       const team2 = currentPlayers.slice(2, 4);
       
       return (
-        <div className="mb-4 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
+        <div className="mb-4 px-2 py-2 bg-white rounded-lg border border-blue-100">
           <div className="flex items-center justify-between">
             <div className="text-sm font-medium text-blue-800 capitalize">
               {team1[0].name} & {team1[1].name}
@@ -95,7 +95,7 @@ export default function CourtCard({ court, players, onComplete }: CourtCardProps
     } else if (!court.isDoubles && currentPlayers.length === 2) {
       // Singles: Player 1 vs Player 2
       return (
-        <div className="mb-4 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
+        <div className="mb-4 px-2 py-2 bg-white rounded-lg border border-blue-100">
           <div className="flex items-center justify-between">
             <div className="text-sm font-medium text-blue-800 capitalize">
               {currentPlayers[0].name}
@@ -120,7 +120,7 @@ export default function CourtCard({ court, players, onComplete }: CourtCardProps
     <div className={`relative z-1 sm:p-4 p-3 h-full flex flex-col rounded-lg bg-[rgba(0,0,0,0.54)] min-h-[195px] sm:min-h-[232px] border border-[#3d3131]
       ${court.status === 'available' ? 'bg-[#262626]' : 'bg-amber-50'}`}>
       <div className="flex justify-between items-start mb-2">
-        <h3 className={`text-[13px] font-bold ${court.status === 'available' ? 'text-white' : 'text-[#262626]'}`}>Court #{court.id}</h3>
+        <h3 className={`text-[15px] font-bold ${court.status === 'available' ? 'text-white' : 'text-[#262626]'}`}>Court #{court.id}</h3>
         <span className={`px-2 py-1 rounded-[50px] text-[10px] border ${court.status === 'available' ? 'text-[#04c951] border-[#04c951] bg-[#210606]' : 'text-[#fd9a01] border-[#fd9a01]'}`}>
           {court.status.toUpperCase()}
         </span>
@@ -136,7 +136,7 @@ export default function CourtCard({ court, players, onComplete }: CourtCardProps
               <span className="font-normal">Start Time:</span> {formatTime(court.startTime)}
             </p>
             
-            <p className="text-sm font-medium">
+            <p className="text-sm font-bold">
               <span className="font-normal">Elapsed Time:</span> {formatTimeValue(elapsedTime.minutes)}:{formatTimeValue(elapsedTime.seconds)}
             </p>
           </div>
