@@ -10,11 +10,14 @@ import { LuUserSearch } from "react-icons/lu";
 import { GiShuttlecock } from "react-icons/gi";
 import { MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
 import { TbAlertTriangle } from "react-icons/tb";
+import { FaListUl } from "react-icons/fa";
+import { MdOutlineRadioButtonUnchecked } from "react-icons/md";
+import { MdOutlineRadioButtonChecked } from "react-icons/md";
 
 import AddPlayerForm from '@/components/players/AddPlayerForm';
 
 export default function AddToQueueForm() {
-  const { state, addPlayerToQueue, markPlayersAsDonePlaying } = useData();
+  const { state, addPlayerToQueue, markPlayersAsDonePlaying, isPlayerInQueue } = useData();
   const { players, feeConfig, queue } = state;
   
   const [selectedPlayers, setSelectedPlayers] = useState<string[]>([]);
@@ -42,10 +45,10 @@ export default function AddToQueueForm() {
     }
   }, []);
   
-  // Get available players (not playing, not in queue, not done playing)
+  // Get available players - MODIFIED to include players who are in queue
+  // but exclude those who are currently playing or done playing (unless showDonePlayers is true)
   const availablePlayers = players.filter(player => 
-    !player.currentlyPlaying && 
-    !player.inQueue && 
+  // Include all players except those marked as "done playing" (unless showDonePlayers is true)
     (showDonePlayers || !player.donePlaying)
   );
 
@@ -148,18 +151,23 @@ export default function AddToQueueForm() {
     <>
       <AddPlayerForm />
 
-      <div className="bg-white p-4 rounded-lg shadow-md mb-5">
+      <div className="bg-white p-4 pt-5 rounded-lg shadow-md mb-5">
         <form onSubmit={handleSubmit}>
           {availablePlayers.length >= 1 && (
             <>
-              <h5 className={`font-medium mb-3 text-center ${availablePlayers.length <= 1 ? `text-[#894b00]` : `text-gray-700`}`}>{availablePlayers.length <= 1 ? `Only ${availablePlayers.length} player added. Please add more.` : 'Players are ready. Start the game!'}</h5>
+              {availablePlayers.length <= 1 && (
+                <h5 className={`font-medium mb-3 text-center ${availablePlayers.length <= 1 ? `text-[#894b00]` : `text-gray-700`}`}>
+                  {availablePlayers.length <= 1 && `Only ${availablePlayers.length} player added. Please add more.`}
+                </h5>
+              )}
+
               {/* Search Player Form */}
-              <div className="mb-4 relative">
-                <LuUserSearch className="absolute left-3 text-[16px] top-[10.5px] text-gray-500" />
+              <div className="mb-3 relative">
+                <LuUserSearch className="absolute left-3 text-[16px] top-[11.5px] text-gray-500" />
                 <input
                   type="text"
-                  className="w-full border border-gray-400 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 pl-8"
-                  placeholder={`Search available players by name`}
+                  className="w-full border border-gray-400 h-[42px] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 pl-8"
+                  placeholder={`Search players`}
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                 />
@@ -177,9 +185,15 @@ export default function AddToQueueForm() {
             <>
               {/* Game Type Selection */}
               <div className="mb-5 flex items-center">
-                <label htmlFor="doubles" className="text-[13px] text-gray-800 block mr-3 whitespace-nowrap">Game type:</label>
-                <div className="flex space-x-3 ml-0 sm:ml-4 gap-3 w-full sm:w-auto">
-                  <label className={`flex items-center mr-0 px-5 h-[36px] text-[12px] gap-[.25rem] rounded-[50px] cursor-pointer bg-gray-100 text-gray-800 w-full sm:w-auto justify-center border-b-[2px] border-b-gray-200 ${gameType === 'doubles' && '!bg-green-200 text-green-800 border-b-green-600'}`}>
+                <label htmlFor="doubles" className="text-sm text-gray-800 block mr-3 whitespace-nowrap">Game type:</label>
+                <div className="flex flex-row sm:gap-0 gap-2">
+
+                  <label
+                    className={`flex items-center p-1 cursor-pointer justify-center text-[14px] w-full ${gameType === 'doubles' && 'text-green-600' }`}
+                  >
+                
+                    {gameType === 'doubles' ? <MdOutlineRadioButtonChecked size={`21px`} className='text-green-500'/> : <MdOutlineRadioButtonUnchecked size={`21px`} className='text-gray-400'/>}
+      
                     <input
                       type="radio"
                       name="gameType"
@@ -191,14 +205,19 @@ export default function AddToQueueForm() {
                       }}
                       className="hidden"
                     />
-                    {gameType === 'doubles' ? <MdRadioButtonChecked size={`1.2em`} />  : <MdRadioButtonUnchecked size={`1.2em`} /> } <span>Doubles</span>
+                    <span className='ml-[4px]'>Doubles</span>
                   </label>
 
-                  <label htmlFor="singles" className={`flex items-center px-5 h-[36px] text-[12px] gap-[.25rem] rounded-[50px] cursor-pointer bg-gray-100 text-gray-800 w-full sm:w-auto justify-center border-b-[2px] border-b-gray-200 ${gameType === 'singles' && '!bg-yellow-200 text-yellow-800 border-b-yellow-600'}`}>
+                  <label
+                    className={`flex items-center p-1 cursor-pointer justify-center text-[14px] w-full ${gameType === 'singles' && 'text-green-600' }`}
+                  >
+                
+                    {gameType === 'singles' ? <MdOutlineRadioButtonChecked size={`21px`} className='text-green-500'/> : <MdOutlineRadioButtonUnchecked size={`21px`} className='text-gray-400'/>}
+      
                     <input
                       type="radio"
                       name="gameType"
-                      id='singles'
+                      id="singles"
                       checked={gameType === 'singles'}
                       onChange={() => {
                         setGameType('singles');
@@ -206,10 +225,13 @@ export default function AddToQueueForm() {
                       }}
                       className="hidden"
                     />
-                    {gameType === 'singles' ? <MdRadioButtonChecked size={`1.2em`} />  : <MdRadioButtonUnchecked size={`1.2em`} /> } <span>Singles</span>
+                    <span className='ml-[4px]'>Singles</span>
                   </label>
+
                 </div>
               </div>
+
+              <h5 className='mb-2 text-gray-900'>{gameType === 'doubles' ? 'Pick 4 Players to Start' : 'Pick 2 Players to Start'}</h5>
             
               {donePlayersCount > 0 && (
                 <div className="mb-3 p-2 bg-gray-50 rounded-md hidden">
@@ -241,6 +263,7 @@ export default function AddToQueueForm() {
                     const teamNumber = getPlayerTeam(player.id);
                     const teamColor = teamNumber === 1 ? 'bg-blue-100 border-blue-300' : 
                                       teamNumber === 2 ? 'bg-red-100 border-red-300' : '';
+                    const playerInQueue = isPlayerInQueue(player.id);
                     
                     return (
                       <div 
@@ -249,8 +272,8 @@ export default function AddToQueueForm() {
                         className={`px-2 py-1.5 border rounded-md cursor-pointer capitalize shadow-md
                           ${teamColor}
                           ${!selectedPlayers.includes(player.id) && 'hover:bg-gray-100'} 
-                          ${player.donePlaying ? 'bg-gray-50 pointer-events-none border-gray-300 shadow-none' : ''}`}
-                      >
+                          ${player.donePlaying ? 'bg-gray-50 pointer-events-none border-gray-300 shadow-none' : ''}`}>
+                        
                         <div className="flex items-center justify-between">
                           <div className="flex items-center">
                             <span className="w-2 sm:w-3 h-2 sm:h-3 rounded-full mr-1.5 sm:mr-2" 
@@ -265,14 +288,27 @@ export default function AddToQueueForm() {
                             </span>
                           </div>
                           
-                          {player.donePlaying && (
-                            <div className="flex items-center">
+                          <div className="flex items-center">
+                            {player.donePlaying && (
                               <span className="text-xs bg-gray-200 text-gray-700 px-1 py-0.5 rounded">
                                 Done
                               </span>
-                            </div>
-                          )}
+                            )}
+                            {/* Show In Queue badge */}
+                            {playerInQueue && !player.donePlaying && !player.currentlyPlaying && (
+                              <span className="text-xs bg-blue-100 text-blue-700 px-1 py-0.5 rounded ml-1">
+                                In Queue
+                              </span>
+                            )}
+                            {/* Add Playing badge */}
+                            {player.currentlyPlaying && (
+                              <span className="text-xs bg-red-100 text-red-700 px-1 py-0.5 rounded ml-1">
+                                Playing
+                              </span>
+                            )}
+                          </div>
                         </div>
+                        
                         <div className="text-xs text-gray-500 ml-3.5 sm:ml-5">
                           Games: {player.gamesPlayed}
                         </div>
@@ -285,10 +321,10 @@ export default function AddToQueueForm() {
               <div className="flex space-x-4 sm:flex-row justify-between flex-col sm:gap-0 gap-2 pt-0 sm:pt-2">
                 <button
                   type="submit"
-                  className="bg-blue-500 hover:bg-blue-600 text-white py-2.5 px-5 rounded-md cursor-pointer flex items-center justify-center transition relative
+                  className="bg-blue-500 hover:bg-blue-600 text-white py-2.5 px-5 rounded-md cursor-pointer flex gap-1.5 items-center justify-center transition relative
               border-b-[4px] border-b-blue-700 hover:border-b-blue-800 active:border-b-blue-900 active:translate-y-[2px] w-full sm:w-auto"
                 >
-                  Add to Queue
+                  <FaListUl /> Add to Queue
                 </button>
 
                 <button
@@ -297,7 +333,7 @@ export default function AddToQueueForm() {
                   disabled={selectedPlayers.length === 0}
                   className="text-gray-500 py-1 px-2 rounded disabled:text-gray-300 disabled:cursor-not-allowed"
                 >
-                  Done playing
+                  Remove player
                 </button>
               </div>
 

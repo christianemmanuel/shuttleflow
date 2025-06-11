@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { useData } from '@/context/DataContext';
 import { useToast } from '@/context/ToastContext';
 import { MdPersonAdd } from "react-icons/md";
+import { MdOutlineRadioButtonUnchecked } from "react-icons/md";
+import { MdOutlineRadioButtonChecked } from "react-icons/md";
 
 interface PlayerListProps {
   inModal?: boolean;
@@ -63,9 +65,12 @@ export default function AddPlayerForm({ inModal = false, onPlayerAdded }: Player
   };
   
   return (
-    <div className={`${inModal ? '' : 'bg-white p-4 rounded-lg shadow-md mb-6 '}`}>
+    <div className={`${inModal ? '' : 'bg-white p-4 rounded-lg shadow-md mb-4.5'}`}>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
+        <div className='mb-3'>
+          <label className="font-sm mb-2 block text-gray-700">
+            Player Name & Skill Level:
+          </label>
           <input
             id="playerName"
             type="text"
@@ -83,16 +88,14 @@ export default function AddPlayerForm({ inModal = false, onPlayerAdded }: Player
           )}
         </div>
         
-        <div className='mb-4'>
-          <label className="block text-[13px] mb-2 text-gray-800">
-            Skill Level:
-          </label>
+        <div className='mb-3.5'>
           <div className="flex flex-row sm:gap-0 gap-2">
             <label
-              className={`flex items-center px-4 py-2 rounded-[50px] cursor-pointer w-full justify-center text-[12px] border-b-[2px] border-b-gray-200 
-                ${skillLevel === 'beginner' ? 'bg-green-200 text-green-800 border-b-green-600' : 'bg-gray-100'}
-              `}
+              className={`flex items-center p-1 cursor-pointer justify-center text-[14px] w-full ${skillLevel === 'beginner' && 'text-green-600' }`}
             >
+         
+              {skillLevel === 'beginner' ? <MdOutlineRadioButtonChecked size={`21px`} className='text-green-500'/> : <MdOutlineRadioButtonUnchecked size={`21px`} className='text-gray-400'/>}
+
               <input
                 type="radio"
                 name="skillLevel"
@@ -100,14 +103,14 @@ export default function AddPlayerForm({ inModal = false, onPlayerAdded }: Player
                 onChange={() => setSkillLevel('beginner')}
                 className="hidden"
               />
-              Beginner
+              <span className='ml-[4px]'>Beginner</span>
             </label>
 
             <label
-              className={`flex items-center px-4 py-2 rounded-[50px] cursor-pointer w-full justify-center text-[12px] border-b-[2px] border-b-gray-200
-                ${skillLevel === 'intermediate' ? 'bg-yellow-200 text-yellow-800 border-b-yellow-600' : 'bg-gray-100'}
-              `}
+              className={`flex items-center p-1 cursor-pointer justify-center text-[14px] w-full ${skillLevel === 'intermediate' && 'text-yellow-600' }`}
             >
+              {skillLevel === 'intermediate' ? <MdOutlineRadioButtonChecked size={`21px`} className='text-yellow-500'/> : <MdOutlineRadioButtonUnchecked size={`21px`} className='text-gray-400'/>}
+
               <input
                 type="radio"
                 name="skillLevel"
@@ -115,14 +118,14 @@ export default function AddPlayerForm({ inModal = false, onPlayerAdded }: Player
                 onChange={() => setSkillLevel('intermediate')}
                 className="hidden"
               />
-              Intermediate
+               <span className='ml-[4px]'>Intermediate</span>
             </label>
 
             <label
-              className={`flex items-center px-4 py-2 rounded-[50px] cursor-pointer w-full justify-center text-[12px] border-b-[2px] border-b-gray-200
-                ${skillLevel === 'advanced' ? 'bg-red-200 text-red-800 border-b-red-600' : 'bg-gray-100'}
-              `}
+              className={`flex items-center p-1 cursor-pointer justify-center text-[14px] w-full ${skillLevel === 'advanced' && 'text-red-600' }`}
             >
+              {skillLevel === 'advanced' ? <MdOutlineRadioButtonChecked size={`21px`} className='text-red-500'/> : <MdOutlineRadioButtonUnchecked size={`21px`} className='text-gray-400'/>}
+
               <input
                 type="radio"
                 name="skillLevel"
@@ -130,10 +133,9 @@ export default function AddPlayerForm({ inModal = false, onPlayerAdded }: Player
                 onChange={() => setSkillLevel('advanced')}
                 className="hidden"
               />
-              Advanced
+              <span className='ml-[4px]'>Advanced</span>
             </label>
           </div>
-
         </div>
         
         <button

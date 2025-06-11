@@ -1,14 +1,14 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useData } from '@/context/DataContext';
 import { formatTime } from '@/lib/utils';
-import { Player, Court, QueueItem as QueueItemType } from '@/types'; // Make sure these types are defined in your types file
+import { Player, Court, QueueItem as QueueItemType } from '@/types';
 import { useToast } from '@/context/ToastContext';
 import useModal from '@/hooks/useModal';
 import Modal from '@/components/ui/Modal';
 import { GiShuttlecock } from "react-icons/gi";
-
+import { TbAlertTriangle } from "react-icons/tb";
 
 interface QueueItemProps {
   queueItem: QueueItemType;
@@ -27,13 +27,38 @@ const QueueItem = ({
   onRemoveFromQueue 
 }: QueueItemProps ) => {
   const alertModal = useModal();
+  const warningModal = useModal(); // New modal for player already playing warning
   const { showToast } = useToast();
-  const { players } = useData().state;
+  const { state } = useData();
+  const { players } = state;
+
+  // State to track which players are already playing (for warning message)
+  const [playersAlreadyPlaying, setPlayersAlreadyPlaying] = useState<Player[]>([]);
 
   const getOrderedPlayers = (playerIds: string[]): Player[] => {
     return playerIds
       .map(id => players.find(player => player.id === id))
       .filter((player): player is Player => player !== undefined);
+  };
+
+  // Check if any players are currently playing
+  const checkPlayersAvailability = () => {
+    const playingPlayers = getOrderedPlayers(queueItem.playerIds)
+      .filter(player => player.currentlyPlaying);
+    
+    if (playingPlayers.length > 0) {
+      setPlayersAlreadyPlaying(playingPlayers);
+      warningModal.openModal();
+      return false;
+    }
+    return true;
+  };
+
+  // Handle assignment with validation
+  const handleAssignToCourt = (courtId?: number) => {
+    if (checkPlayersAvailability()) {
+      onAssignMatch(queueItem.id, queueItem.playerIds, courtId);
+    }
   };
 
   const formatPlayerDisplay = () => {
@@ -49,11 +74,13 @@ const QueueItem = ({
             <div className="text-center sm:px-3 sm:py-2 py-3 px-2.5 bg-white rounded-md border border-gray-300 w-full">
               <div className="flex items-center justify-between capitalize sm:flex-row flex-row sm:gap-0.5 gap-2.5">
                 <div className="text-sm font-medium text-blue-800">
-                  {team1[0].name} & {team1[1].name}
+                  {team1[0].name} {team1[0].currentlyPlaying && <span className="text-xs text-red-500 ml-1">(Playing)</span>} & 
+                  {team1[1].name} {team1[1].currentlyPlaying && <span className="text-xs text-red-500 ml-1">(Playing)</span>}
                 </div>
                 <div className="text-xs px-2 py-1 bg-gray-200 text-[9px] rounded-full font-bold uppercase">vs</div>
                 <div className="text-sm font-medium text-green-800">
-                  {team2[0].name} & {team2[1].name}
+                  {team2[0].name} {team2[0].currentlyPlaying && <span className="text-xs text-red-500 ml-1">(Playing)</span>} & 
+                  {team2[1].name} {team2[1].currentlyPlaying && <span className="text-xs text-red-500 ml-1">(Playing)</span>}
                 </div>
               </div>
             </div>
@@ -67,11 +94,13 @@ const QueueItem = ({
             <div className="text-center sm:px-3 sm:py-2 py-3 px-2.5 bg-white rounded-md border border-gray-300 w-full">
               <div className="flex items-center justify-between capitalize sm:flex-row flex-row">
                 <div className="text-sm font-medium text-blue-800">
-                  {queuedPlayers[0].name}
+                  {queuedPlayers[0].name} 
+                  {queuedPlayers[0].currentlyPlaying && <span className="text-xs text-red-500 ml-1">(Playing)</span>}
                 </div>
                 <div className="text-xs px-2 py-1 bg-gray-200 text-[9px] rounded-full font-bold uppercase">vs</div>
                 <div className="text-sm font-medium text-green-800">
                   {queuedPlayers[1].name}
+                  {queuedPlayers[1].currentlyPlaying && <span className="text-xs text-red-500 ml-1">(Playing)</span>}
                 </div>
               </div>
             </div>
@@ -92,7 +121,10 @@ const QueueItem = ({
                       player.skillLevel === 'intermediate' ? '#facc15' : '#f87171'
                   }}
                 ></span>
-                {player.name} ({player.gamesPlayed} games)
+                <span className={`${player.currentlyPlaying ? 'text-red-500 font-medium' : ''}`}>
+                  {player.name} ({player.gamesPlayed} games)
+                  {player.currentlyPlaying && ' (Playing)'}
+                </span>
               </div>
             ))}
           </div>
@@ -126,8 +158,8 @@ const QueueItem = ({
             {availableCourts.map(court => (
               <button
                 key={court.id}
-                onClick={() => onAssignMatch(queueItem.id, queueItem.playerIds, court.id)}
-                className="bg-blue-500 hover:bg-blue-600 border-b-[4px] border-b-blue-700 text-white py-1.5 px-3 rounded sm:text-sm text-[13px] cursor-pointer transition"
+                onClick={() => handleAssignToCourt(court.id)}
+                                className="bg-blue-500 hover:bg-blue-600 border-b-[4px] border-b-blue-700 text-white py-1.5 px-3 rounded sm:text-sm text-[13px] cursor-pointer transition"
               >
                 Court {court.id}
               </button>
@@ -142,6 +174,46 @@ const QueueItem = ({
           Cancel match
         </button>
         
+        {/* Warning Modal for players already playing */}
+        <Modal
+          isOpen={warningModal.isOpen}
+          onClose={warningModal.closeModal}
+          maxWidth="md"
+          title="Players Already Playing"
+        >
+          <div className="overflow-y-auto">
+            <div className="bg-amber-50 border-l-4 border-amber-500 p-4 mb-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <TbAlertTriangle className="h-5 w-5 text-amber-500" />
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-amber-700">
+                    You can't assign this match to a court because the following players are already playing:
+                  </p>
+                  <ul className="mt-2 text-sm text-amber-700 list-disc list-inside">
+                    {playersAlreadyPlaying.map(player => (
+                      <li key={player.id}>{player.name}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600">
+              Please wait until these players finish their current match, or remove this match from the queue.
+            </p>
+            <div className="mt-4 flex justify-end">
+              <button
+                onClick={warningModal.closeModal}
+                className="bg-gray-200 hover:bg-gray-300 text-gray-800 py-1.5 px-4 rounded"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </Modal>
+        
+        {/* Cancel Match Modal */}
         <Modal
           isOpen={alertModal.isOpen}
           onClose={alertModal.closeModal}
@@ -187,11 +259,15 @@ export default function QueueDisplay() {
     const courtId = selectedCourtId || (availableCourts.length > 0 ? availableCourts[0].id : null);
     
     if (courtId) {
-      assignToCourt(courtId, playerIds);
-      removePlayerFromQueue(queueId);
-      showToast(`Match assigned to Court ${courtId}`, 'success', 3500);
+      const result = assignToCourt(courtId, playerIds);
+      
+      if (result.success) {
+        removePlayerFromQueue(queueId);
+        showToast(`Match assigned to Court ${courtId}`, 'success', 3500);
+      }
+      // Error case is handled in the QueueItem component with the warning modal
     } else {
-      alert('No courts available. Please wait for a court to become available.');
+      showToast('No courts available. Please wait for a court to become available.', 'error');
     }
   };
 

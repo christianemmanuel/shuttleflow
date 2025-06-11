@@ -10,8 +10,9 @@ import {
 } from '@/lib/localStorage';
 import {
   addPlayer,
-  addToQueue,
-  removeFromQueue,
+  // We'll implement queue functions directly in the context
+  // addToQueue,
+  // removeFromQueue,
   suggestNextMatch,
   generateId
 } from '@/lib/utils';
@@ -19,7 +20,7 @@ import {
 interface DataContextType {
   state: AppState;
   addNewPlayer: (name: string, skillLevel: Player['skillLevel']) => void;
-  assignToCourt: (courtId: number, playerIds: string[]) => void;
+  assignToCourt: (courtId: number, playerIds: string[]) => { success: boolean; playersAlreadyPlaying?: Player[] };
   completeMatch: (courtId: number) => void;
   addPlayerToQueue: (playerIds: string[], isDoubles: boolean) => void;
   removePlayerFromQueue: (queueId: string) => void;
@@ -31,6 +32,7 @@ interface DataContextType {
   markFeesAsPaid: (playerId: string, amount: number) => void;
   markPlayerAsDonePlaying: (playerId: string) => void;
   markPlayersAsDonePlaying: (playerIds: string[]) => void;
+  isPlayerInQueue: (playerId: string) => boolean;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -58,8 +60,26 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     setState(currentState => addPlayer(currentState, name, skillLevel));
   };
 
+  // Check if a player is in any queue
+  const isPlayerInQueue = (playerId: string): boolean => {
+    return state.queue.some(item => item.playerIds.includes(playerId));
+  };
+
   // Court management
   const assignToCourt = (courtId: number, playerIds: string[]) => {
+    // Check if any players are already playing
+    const playersAlreadyPlaying = state.players.filter(
+      player => playerIds.includes(player.id) && player.currentlyPlaying
+    );
+    
+    // If any players are already playing, return error information
+    if (playersAlreadyPlaying.length > 0) {
+      return {
+        success: false,
+        playersAlreadyPlaying
+      };
+    }
+    
     const isDoubles = playerIds.length === 4;
     const gameId = generateId();
     const currentTime = new Date().toISOString();
@@ -100,10 +120,10 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
           : court
       );
       
-      // Update players
+      // Update players - only set currentlyPlaying, don't change inQueue status
       const updatedPlayers = currentState.players.map(player => 
         playerIds.includes(player.id)
-          ? { ...player, currentlyPlaying: true, inQueue: false }
+          ? { ...player, currentlyPlaying: true }
           : player
       );
       
@@ -114,130 +134,152 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         gameSessions: [...currentState.gameSessions, newGameSession]
       };
     });
+    
+    return { success: true };
   };
 
   const completeMatch = (courtId: number) => {
-  setState(currentState => {
-    const court = currentState.courts.find(c => c.id === courtId);
-    
-    if (!court || !court.currentGameId) return currentState;
-    
-    const currentTime = new Date().toISOString();
-    
-    // Find the game session
-    const gameSession = currentState.gameSessions.find(
-      game => game.id === court.currentGameId
-    );
-    
-    if (!gameSession) return currentState;
-    
-    // Calculate game duration
-    const startTime = new Date(gameSession.startTime).getTime();
-    const endTime = new Date(currentTime).getTime();
-    const durationMinutes = Math.round((endTime - startTime) / 60000);
-    
-    // Update game session
-    const updatedGameSessions = currentState.gameSessions.map(game =>
-      game.id === court.currentGameId
-        ? {
-            ...game,
-            endTime: currentTime,
-            duration: durationMinutes,
-            status: 'completed' as const,
+    setState(currentState => {
+      const court = currentState.courts.find(c => c.id === courtId);
+      
+      if (!court || !court.currentGameId) return currentState;
+      
+      const currentTime = new Date().toISOString();
+      
+      // Find the game session
+      const gameSession = currentState.gameSessions.find(
+        game => game.id === court.currentGameId
+      );
+      
+      if (!gameSession) return currentState;
+      
+      // Calculate game duration
+      const startTime = new Date(gameSession.startTime).getTime();
+      const endTime = new Date(currentTime).getTime();
+      const durationMinutes = Math.round((endTime - startTime) / 60000);
+      
+      // Update game session
+      const updatedGameSessions = currentState.gameSessions.map(game =>
+        game.id === court.currentGameId
+          ? {
+              ...game,
+              endTime: currentTime,
+              duration: durationMinutes,
+              status: 'completed' as const,
+            }
+          : game
+      );
+      
+      // Update players - increment games played and update fees if auto-calculate is on
+      const updatedPlayers = currentState.players.map(player => {
+        if (court.players.includes(player.id)) {
+          // Basic update - mark as not playing and increment games
+          let playerUpdate = {
+            ...player,
+            currentlyPlaying: false,
+            gamesPlayed: player.gamesPlayed + 1
+          };
+          
+          // Add fees if auto-calculate is enabled
+          if (currentState.feeConfig.autoCalculate) {
+            const feeAmount = gameSession.feePerPlayer;
+            
+            // Add fee history record
+            const feeHistoryItem = {
+              gameId: gameSession.id,
+              courtId,
+              gameType: gameSession.gameType,
+              feeAmount,
+              timestamp: currentTime,
+              paid: false
+            };
+            
+            playerUpdate = {
+              ...playerUpdate,
+              totalFees: playerUpdate.totalFees + feeAmount,
+              unpaidFees: playerUpdate.unpaidFees + feeAmount,
+              feeHistory: [...(playerUpdate.feeHistory || []), feeHistoryItem]
+            };
           }
-        : game
-    );
-    
-    // Update players - increment games played and update fees if auto-calculate is on
-    const updatedPlayers = currentState.players.map(player => {
-      if (court.players.includes(player.id)) {
-        // Basic update - mark as not playing and increment games
-        let playerUpdate = {
-          ...player,
-          currentlyPlaying: false,
-          gamesPlayed: player.gamesPlayed + 1
-        };
-        
-        // Add fees if auto-calculate is enabled
-        if (currentState.feeConfig.autoCalculate) {
-          const feeAmount = gameSession.feePerPlayer;
           
-          // Add fee history record
-          const feeHistoryItem = {
-            gameId: gameSession.id,
-            courtId,
-            gameType: gameSession.gameType,
-            feeAmount,
-            timestamp: currentTime,
-            paid: false
-          };
-          
-          playerUpdate = {
-            ...playerUpdate,
-            totalFees: playerUpdate.totalFees + feeAmount,
-            unpaidFees: playerUpdate.unpaidFees + feeAmount,
-            feeHistory: [...(playerUpdate.feeHistory || []), feeHistoryItem]
-          };
+          return playerUpdate;
         }
-        
-        return playerUpdate;
-      }
-      return player;
+        return player;
+      });
+      
+      // Update court
+      const updatedCourts = currentState.courts.map(court => 
+        court.id === courtId 
+          ? {
+              ...court,
+              status: 'available' as const,
+              players: [],
+              startTime: null,
+              isDoubles: false,
+              currentGameId: null
+            }
+          : court
+      );
+      
+      // Create a MatchRecord for the match history
+      const matchRecord = {
+        id: gameSession.id,
+        courtId,
+        playerIds: court.players,
+        isDoubles: court.isDoubles,
+        startTime: gameSession.startTime,
+        endTime: currentTime,
+        durationMinutes,
+        feesCharged: gameSession.totalFees,
+        // Cache player names for easier display/searching
+        playerNames: court.players.map(id => {
+          const player = currentState.players.find(p => p.id === id);
+          return player ? player.name : 'Unknown Player';
+        })
+      };
+      
+      // IMPORTANT: Safely add to match history, handling the case where it might be undefined
+      const currentMatchHistory = Array.isArray(currentState.matchHistory) 
+        ? currentState.matchHistory 
+        : [];
+      
+      return {
+        ...currentState,
+        courts: updatedCourts,
+        players: updatedPlayers,
+        gameSessions: updatedGameSessions,
+        matchHistory: [...currentMatchHistory, matchRecord] // Safely add to match history
+      };
     });
-    
-    // Update court
-    const updatedCourts = currentState.courts.map(court => 
-      court.id === courtId 
-        ? {
-            ...court,
-            status: 'available' as const,
-            players: [],
-            startTime: null,
-            isDoubles: false,
-            currentGameId: null
-          }
-        : court
-    );
-    
-    // Create a MatchRecord for the match history
-    const matchRecord = {
-      id: gameSession.id,
-      courtId,
-      playerIds: court.players,
-      isDoubles: court.isDoubles,
-      startTime: gameSession.startTime,
-      endTime: currentTime,
-      durationMinutes,
-      feesCharged: gameSession.totalFees,
-      // Cache player names for easier display/searching
-      playerNames: court.players.map(id => {
-        const player = currentState.players.find(p => p.id === id);
-        return player ? player.name : 'Unknown Player';
-      })
-    };
-    
-    // IMPORTANT: Safely add to match history, handling the case where it might be undefined
-    const currentMatchHistory = Array.isArray(currentState.matchHistory) 
-      ? currentState.matchHistory 
-      : [];
-    
-    return {
-      ...currentState,
-      courts: updatedCourts,
-      players: updatedPlayers,
-      gameSessions: updatedGameSessions,
-      matchHistory: [...currentMatchHistory, matchRecord] // Safely add to match history
-    };
-  });
-};
-
-  // Queue management
-  const addPlayerToQueue = (playerIds: string[], isDoubles: boolean) => {
-    setState(currentState => addToQueue(currentState, playerIds, isDoubles));
   };
 
+  // Queue management - MODIFIED
+  const addPlayerToQueue = (playerIds: string[], isDoubles: boolean) => {
+    // Create a new queue item directly
+    setState(currentState => {
+      const newQueueItem: QueueItem = {
+        id: generateId(),
+        playerIds,
+        requestedTime: new Date().getTime().toString(),
+        isDoubles
+      };
+      
+      return {
+        ...currentState,
+        queue: [...currentState.queue, newQueueItem]
+      };
+    });
+  };
+
+  // MODIFIED - only remove the queue item, don't update player statuses
   const removePlayerFromQueue = (queueId: string) => {
-    setState(currentState => removeFromQueue(currentState, queueId));
+    setState(currentState => {
+      // Just filter out the queue item by ID
+      return {
+        ...currentState,
+        queue: currentState.queue.filter(item => item.id !== queueId)
+      };
+    });
   };
 
   const getNextMatch = (): QueueItem | null => {
@@ -336,10 +378,10 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       
       if (playerIndex === -1) return currentState;
       
-      // Check if player is available to be marked (not playing, not in queue)
+      // Check if player is available to be marked (not playing)
       const player = currentState.players[playerIndex];
-      if (player.currentlyPlaying || player.inQueue) {
-        console.error("Cannot mark a player who is currently playing or in queue as done");
+      if (player.currentlyPlaying) {
+        console.error("Cannot mark a player who is currently playing as done");
         return currentState;
       }
       
@@ -357,7 +399,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  // This is for marking multiple players at once
+  // This is for marking multiple players at once - MODIFIED to allow marking players in queue
   const markPlayersAsDonePlaying = (playerIds: string[]) => {
     setState(currentState => {
       // Create a copy of players array
@@ -370,8 +412,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         if (playerIndex !== -1) {
           const player = updatedPlayers[playerIndex];
           
-          // Only mark if player is available
-          if (!player.currentlyPlaying && !player.inQueue) {
+          // Only mark if player is not currently playing (removed inQueue check)
+          if (!player.currentlyPlaying) {
             updatedPlayers[playerIndex] = {
               ...player,
               donePlaying: true // Always set to true (not toggle)
@@ -398,12 +440,12 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         removePlayerFromQueue,
         getNextMatch,
         resetAll,
-        // Fee management
         updateFeeConfig,
         updatePlayerFees,
         markFeesAsPaid,
         markPlayerAsDonePlaying,
-        markPlayersAsDonePlaying
+        markPlayersAsDonePlaying,
+        isPlayerInQueue
       }}
     >
       {children}
