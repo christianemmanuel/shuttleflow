@@ -21,13 +21,13 @@ export default function Header() {
   // Helper function to determine if link is active
   const isActive = (path: string) => pathname === path;
   
-  // Helper function to check if any court has players
-  const arePlayersOnCourt = () => {
-    return state.courts.some(court => court.status === 'occupied' && court.players.length > 0);
-  };
-  
   // Load notification preference and check court status on mount and when courts change
   useEffect(() => {
+    // Moving the arePlayersOnCourt function inside useEffect to fix the dependency warning
+    const arePlayersOnCourt = () => {
+      return state.courts.some(court => court.status === 'occupied' && court.players.length > 0);
+    };
+    
     const hideCourtNotification = loadFromLocalStorage('hideCourtNotification', false);
     
     // Only show notification if there are players on court AND the user hasn't dismissed it
@@ -36,7 +36,7 @@ export default function Header() {
     } else {
       setShowCourtNotification(false);
     }
-  }, [state.courts]); // Re-run when courts state changes
+  }, [state.courts]); // Now this is correct since arePlayersOnCourt is defined inside
   
   // Handle click on the Court link
   const handleCourtLinkClick = () => {
@@ -137,7 +137,6 @@ export default function Header() {
           </nav>
         </div>
       </header>
-
     </>
   );
 }

@@ -6,7 +6,6 @@ import useModal from '@/hooks/useModal';
 import Modal from '@/components/ui/Modal';
 import { useToast } from '@/context/ToastContext';
 
-import { LuUserSearch } from "react-icons/lu";
 import { GiShuttlecock } from "react-icons/gi";
 import { TbAlertTriangle } from "react-icons/tb";
 import { FaListUl } from "react-icons/fa";
