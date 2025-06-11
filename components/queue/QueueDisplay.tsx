@@ -189,7 +189,7 @@ const QueueItem = ({
                 </div>
                 <div className="ml-3">
                   <p className="text-sm text-amber-700">
-                    You can't assign this match to a court because the following players are already playing:
+                    You can&apos;t assign this match to a court because the following players are already playing:
                   </p>
                   <ul className="mt-2 text-sm text-amber-700 list-disc list-inside">
                     {playersAlreadyPlaying.map(player => (

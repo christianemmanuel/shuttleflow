@@ -1,12 +1,9 @@
 'use client';
 
 import AddToQueueForm from '@/components/queue/AddToQueueForm';
-import AddPlayerForm from '@/components/players/AddPlayerForm';
 import QueueDisplay from '@/components/queue/QueueDisplay';
 import MatchHistory from '@/components/history/MatchHistory'; // Import your MatchHistory component
 import useModal from '@/hooks/useModal';
-import Modal from '@/components/ui/Modal';
-import { MdPersonAdd } from "react-icons/md";
 import React, { useState } from 'react';
 import { useData } from '@/context/DataContext';
 
@@ -14,16 +11,6 @@ const Queue = () => {
   const { state } = useData();
   const { queue, players } = state;
   
-
-  const availablePlayers = players.filter(player => 
-    !player.currentlyPlaying
-  );
-
-  const donePlayers = players.filter(player => 
-    player.donePlaying
-  );
-
-  const addPlayerModal = useModal();
   // Add 'history' to the possible tab states
   const [activeTab, setActiveTab] = useState<'players' | 'queue' | 'history'>('players');
 
