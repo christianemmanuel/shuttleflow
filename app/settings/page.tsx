@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react'
+import Link from 'next/link';
 import { useData } from '@/context/DataContext';
 import { useLoader } from '@/context/LoaderContext';
 import Modal from '@/components/ui/Modal';
@@ -44,6 +45,14 @@ const Settings = () => {
             <div className="bg-gray-100 p-4 rounded-lg flex items-center justify-between">
               <p className="text-sm text-gray-800">Terms of Use</p>
               <button type="submit" className="bg-gray-500 hover:bg-gray-600 text-white py-1 px-4 h-[34px] min-w-[87px] rounded-md cursor-pointer flex items-center justify-center transition relative w-auto">View</button>
+            </div>
+          </div>
+        
+          <div className="grid grid-cols-1 max-w-[600px] gap-1 mb-2.5">
+            <h5 className='text-[13px] font-medium text-gray-500 mt-3'>Others</h5>
+            <div className="bg-gray-100 p-4 rounded-lg flex items-center justify-between">
+              <p className="text-sm text-gray-800">Survey Form</p>
+              <Link href='https://tally.so/r/n9g4Y4' target='_blank' className="bg-red-500 hover:bg-red-600 text-white py-1 px-4 h-[34px] min-w-[87px] rounded-md cursor-pointer flex items-center justify-center transition relative w-auto">Give Feedback</Link>
             </div>
           </div>
           

@@ -1,6 +1,7 @@
 import './globals.css';
 import { Noto_Sans } from 'next/font/google';
 import ClientLayout from './client-layout';
+import { Analytics } from '@vercel/analytics/next';
 
 const notoSans = Noto_Sans({ 
   subsets: ['latin'],
@@ -22,6 +23,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${notoSans.className} bg-gray-100 min-h-screen`}>
         <ClientLayout>{children}</ClientLayout>
+        <Analytics />
       </body>
     </html>
   );
