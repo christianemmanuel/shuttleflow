@@ -12,6 +12,11 @@ const notoSans = Noto_Sans({
 export const metadata = {
   title: 'ShuttleFlow - Smart Badminton Queuing Management',
   description: 'Smart badminton court management system',
+  icons: {
+    icon: '/favicon.ico',
+    // Optional: add different sizes
+    apple: '/apple-touch-icon.png'
+  },
 };
 
 export default function RootLayout({
