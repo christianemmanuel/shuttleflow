@@ -65,6 +65,24 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     return state.queue.some(item => item.playerIds.includes(playerId));
   };
 
+  // Calculate court fee per player based on config
+  const calculateCourtFeePerPlayer = (playerCount: number, feeConfig: FeeConfig): number => {
+    if (!feeConfig.courtFeeType || !feeConfig.courtFeeAmount) return 0;
+    
+    if (feeConfig.courtFeeType === "perHead") {
+      return feeConfig.courtFeeAmount;
+    }
+    
+    if (feeConfig.courtFeeType === "perHour") {
+      const numCourts = feeConfig.numCourts || 1;
+      const rentalHours = feeConfig.rentalHours || 1;
+      const totalCourtFee = feeConfig.courtFeeAmount * numCourts * rentalHours;
+      return playerCount > 0 ? totalCourtFee / playerCount : 0;
+    }
+    
+    return 0;
+  };
+
   // Court management
   const assignToCourt = (courtId: number, playerIds: string[]) => {
     // Check if any players are already playing
@@ -170,6 +188,13 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
           : game
       );
       
+      // ===== FIXED: Calculate court fee per player =====
+      const playersInGame = court.players.length;
+      const courtFeePerPlayer = calculateCourtFeePerPlayer(
+        playersInGame, 
+        currentState.feeConfig
+      );
+      
       // Update players - increment games played and update fees if auto-calculate is on
       const updatedPlayers = currentState.players.map(player => {
         if (court.players.includes(player.id)) {
@@ -182,22 +207,26 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
           
           // Add fees if auto-calculate is enabled
           if (currentState.feeConfig.autoCalculate) {
-            const feeAmount = gameSession.feePerPlayer;
+            // ===== FIXED: Include both match fee and court fee =====
+            const matchFee = gameSession.feePerPlayer;
+            const totalFeeAmount = matchFee + courtFeePerPlayer;
             
-            // Add fee history record
+            // Add fee history record (including both fees)
             const feeHistoryItem = {
               gameId: gameSession.id,
               courtId,
               gameType: gameSession.gameType,
-              feeAmount,
+              feeAmount: totalFeeAmount, // Include both fees
+              matchFee,                  // Original match fee 
+              courtFee: courtFeePerPlayer, // Court fee component
               timestamp: currentTime,
               paid: false
             };
             
             playerUpdate = {
               ...playerUpdate,
-              totalFees: playerUpdate.totalFees + feeAmount,
-              unpaidFees: playerUpdate.unpaidFees + feeAmount,
+              totalFees: playerUpdate.totalFees + totalFeeAmount,
+              unpaidFees: playerUpdate.unpaidFees + totalFeeAmount,
               feeHistory: [...(playerUpdate.feeHistory || []), feeHistoryItem]
             };
           }
@@ -230,7 +259,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         startTime: gameSession.startTime,
         endTime: currentTime,
         durationMinutes,
-        feesCharged: gameSession.totalFees,
+        feesCharged: gameSession.totalFees + (courtFeePerPlayer * court.players.length), // FIXED: Include court fees
         // Cache player names for easier display/searching
         playerNames: court.players.map(id => {
           const player = currentState.players.find(p => p.id === id);
@@ -253,34 +282,65 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  // Queue management - MODIFIED
-  const addPlayerToQueue = (playerIds: string[], isDoubles: boolean) => {
-    // Create a new queue item directly
-    setState(currentState => {
-      const newQueueItem: QueueItem = {
-        id: generateId(),
-        playerIds,
-        requestedTime: new Date().toISOString(),
-        isDoubles
-      };
-      
-      return {
-        ...currentState,
-        queue: [...currentState.queue, newQueueItem]
-      };
-    });
-  };
+ // Queue management - MODIFIED
+const addPlayerToQueue = (playerIds: string[], isDoubles: boolean) => {
+  // Create a new queue item directly
+  setState(currentState => {
+    const newQueueItem: QueueItem = {
+      id: generateId(),
+      playerIds,
+      requestedTime: new Date().toISOString(),
+      isDoubles
+    };
+    
+    // Update the inQueue property for the selected players
+    const updatedPlayers = currentState.players.map(player => 
+      playerIds.includes(player.id) 
+        ? { ...player, inQueue: true }
+        : player
+    );
+    
+    return {
+      ...currentState,
+      queue: [...currentState.queue, newQueueItem],
+      players: updatedPlayers  // Also update the player objects
+    };
+  });
+};
 
-  // MODIFIED - only remove the queue item, don't update player statuses
-  const removePlayerFromQueue = (queueId: string) => {
-    setState(currentState => {
-      // Just filter out the queue item by ID
-      return {
-        ...currentState,
-        queue: currentState.queue.filter(item => item.id !== queueId)
-      };
+// MODIFIED - update to also update player inQueue status
+const removePlayerFromQueue = (queueId: string) => {
+  setState(currentState => {
+    // Find the queue item to be removed
+    const queueItem = currentState.queue.find(item => item.id === queueId);
+    if (!queueItem) return currentState;
+    
+    // Get the player IDs from the queue item
+    const playerIdsToRemove = queueItem.playerIds;
+    
+    // Filter out the queue item
+    const updatedQueue = currentState.queue.filter(item => item.id !== queueId);
+    
+    // Update inQueue status for players who are no longer in any queue
+    const updatedPlayers = currentState.players.map(player => {
+      if (playerIdsToRemove.includes(player.id)) {
+        // Check if the player is still in any other queue
+        const stillInQueue = updatedQueue.some(item => item.playerIds.includes(player.id));
+        return {
+          ...player,
+          inQueue: stillInQueue
+        };
+      }
+      return player;
     });
-  };
+    
+    return {
+      ...currentState,
+      queue: updatedQueue,
+      players: updatedPlayers
+    };
+  });
+};
 
   const getNextMatch = (): QueueItem | null => {
     return suggestNextMatch(state);

@@ -82,8 +82,8 @@ export default function Header() {
               href="/" 
               className={`mx-3 px-2 flex justify-between items-center flex-col gap-1 rounded-md text-[12px] font-medium transition relative ${
                 isActive('/') 
-                  ? 'text-red-500 hover:bg-red-100' 
-                  : 'text-gray-400 hover:bg-gray-100'
+                  ? 'text-red-500' 
+                  : 'text-gray-400'
               }`}
               onClick={handleCourtLinkClick}
             >
@@ -103,8 +103,8 @@ export default function Header() {
               href="/players" 
               className={`mx-3 px-2 flex justify-between items-center flex-col gap-1 rounded-md text-[12px] font-medium transition ${
                 isActive('/players') 
-                  ? 'text-red-500 hover:bg-red-100' 
-                  : 'text-gray-400 hover:bg-gray-100'
+                  ? 'text-red-500' 
+                  : 'text-gray-400'
               }`}
             >
               <BsPersonLinesFill size="1.4rem"/>
@@ -115,8 +115,8 @@ export default function Header() {
               href="/fees" 
               className={`mx-3 px-2 flex justify-between items-center flex-col gap-1 rounded-md text-[12px] font-medium transition ${
                 isActive('/fees') 
-                  ? 'text-red-500 hover:bg-red-100' 
-                  : 'text-gray-400 hover:bg-gray-100'
+                  ? 'text-red-500' 
+                  : 'text-gray-400'
               }`}
             >
               <GrMoney size="1.2rem"/>
@@ -127,8 +127,8 @@ export default function Header() {
               href="/settings" 
               className={`mx-3 px-2 flex justify-between items-center flex-col gap-1 rounded-md text-[12px] font-medium transition ${
                 isActive('/settings') 
-                  ? 'text-red-500 hover:bg-red-100' 
-                  : 'text-gray-400 hover:bg-gray-100'
+                  ? 'text-red-500' 
+                  : 'text-gray-400'
               }`}
             >
               <FiSettings size="1.3rem"/>

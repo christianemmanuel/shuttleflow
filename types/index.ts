@@ -42,6 +42,8 @@ export type QueueItem = {
   isDoubles: boolean;
 };
 
+export type CourtFeeType = "perHour" | "perHead";
+
 // Fee Configuration Type
 export type FeeConfig = {
   singlesFee: number;
@@ -49,6 +51,10 @@ export type FeeConfig = {
   currency: string;
   autoCalculate: boolean;
   requirePayment: boolean;
+  courtFeeType?: CourtFeeType;      // "perHour" or "perHead"
+  courtFeeAmount?: number;          // Amount (per hour or per player)
+  numCourts?: number;               // Only used when "perHour"
+  rentalHours?: number;
 };
 
 // Game Session Type
@@ -88,3 +94,4 @@ export type AppState = {
   gameSessions: GameSession[];
   matchHistory: MatchRecord[];
 };
+

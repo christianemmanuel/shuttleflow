@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { useData } from '@/context/DataContext';
-import { formatCurrency } from '@/lib/utils';
 
 export default function PlayerList() {
   const { state } = useData();
@@ -181,12 +180,6 @@ export default function PlayerList() {
                   Games Played
                 </th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Total Fees
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Unpaid Fees
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
               </tr>
@@ -206,16 +199,6 @@ export default function PlayerList() {
                   </td>
                   <td className={`px-4 py-2 whitespace-nowrap ${player.donePlaying && 'opacity-50'}`}>
                     {player.gamesPlayed}
-                  </td>
-                  <td className={`px-4 py-2 whitespace-nowrap ${player.donePlaying && 'opacity-50'}`}>
-                    <span className={player.totalFees > 0 ? 'text-green-600 font-medium' : ''}>
-                      {formatCurrency(player.totalFees, feeConfig.currency)}
-                    </span>
-                  </td>
-                  <td className={`px-4 py-2 whitespace-nowrap ${player.donePlaying && 'opacity-50'}`}>
-                    <span className={player.unpaidFees > 0 ? 'text-red-600 font-medium' : ''}>
-                      {formatCurrency(player.unpaidFees, feeConfig.currency)}
-                    </span>
                   </td>
                   <td className={`px-4 py-2 whitespace-nowrap`}>
                     <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(player)}`}>
