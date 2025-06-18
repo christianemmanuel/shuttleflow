@@ -66,12 +66,6 @@ export default function FeeManagement() {
     return null;
   };
 
-  // Get unpaid players and all active players
-  const unpaidPlayers = players.filter(player => player.unpaidFees > 0);
-  const unpaidPlayerCount = unpaidPlayers.length;
-  const activePlayers = players.filter(player => player.gamesPlayed > 0);
-  const activePlayerCount = activePlayers.length || 1; // avoid division by zero
-
   // We no longer need to calculate court fee separately for outstanding,
   // as it's now included in player.unpaidFees
   const outstandingRevenue = players.reduce((sum, player) => sum + player.unpaidFees, 0);

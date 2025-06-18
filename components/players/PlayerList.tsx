@@ -5,7 +5,7 @@ import { useData } from '@/context/DataContext';
 
 export default function PlayerList() {
   const { state } = useData();
-  const { players, feeConfig } = state;
+  const { players } = state;
   
   // Add search state
   const [searchQuery, setSearchQuery] = useState('');
