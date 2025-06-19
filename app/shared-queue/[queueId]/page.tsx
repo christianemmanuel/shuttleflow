@@ -8,7 +8,6 @@ import { GiShuttlecock } from "react-icons/gi";
 import { formatTime } from '@/lib/utils';
 import useModal from '@/hooks/useModal';
 import Modal from '@/components/ui/Modal';
-import Link from 'next/link';
 
 // Define types for your data structure
 interface Player {
@@ -50,6 +49,10 @@ export default function SharedQueueView() {
   const [refreshing, setRefreshing] = useState(false);
 
   const showCurrentlyPlaying = useModal();
+
+  const handleClick = () => {
+    window.location.href = '/';
+  };
   
   useEffect(() => {
     if (!queueId) {
@@ -127,7 +130,12 @@ export default function SharedQueueView() {
   return (
     <div className="max-w-4xl mx-auto p-4">
       <div className="flex items-center justify-center mb-4">
-        <a href="/"className='flex items-center gap-[0.15rem] text-white font-semibold text-[18px] cursor-pointer'>ShuttleFlow <GiShuttlecock className='rotate-[205deg]' /></a>
+        <button 
+          onClick={handleClick}
+          className="flex items-center gap-[0.15rem] text-white font-semibold text-[18px] cursor-pointer hover:opacity-80 transition-opacity"
+        >
+          ShuttleFlow <GiShuttlecock className="rotate-[205deg]" />
+        </button>
       </div>
       
       <div className="bg-white p-4 rounded-lg shadow-md mb-5">
