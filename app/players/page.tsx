@@ -82,7 +82,7 @@ const Queue = () => {
       </div>
       
       {/* Tab Content - Updated with MatchHistory */}
-      <div className='hidden'><ClientQueueDisplay /></div>
+      <div className='fixed top-[9999px] w-0 h-0 left-[99999px]'><ClientQueueDisplay /></div>
       <div className="mt-4">
         {activeTab === 'players' && <AddToQueueForm /> }
         {activeTab === 'queue' && <QueueDisplay />}

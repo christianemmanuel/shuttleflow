@@ -19,8 +19,6 @@ export default function FeeManagement() {
     player => player.totalFees > 0
   );
 
-  // Store last paid played amount per player
-  const [paidAmounts, setPaidAmounts] = useState<{ [playerId: string]: number }>({});
 
   // Calculate court fee per player
   const calculateCourtFeePerPlayer = () => {
@@ -55,7 +53,6 @@ export default function FeeManagement() {
 
     // Include court fee in the paid amount
     const paidAmount = player.unpaidFees + (player.gamesPlayed > 0 ? courtFeePerPlayer : 0);
-    setPaidAmounts(prev => ({ ...prev, [playerId]: paidAmount }));
     
     // Mark the base fees as paid through the context
     markFeesAsPaid(playerId, player.unpaidFees);
@@ -74,10 +71,6 @@ export default function FeeManagement() {
       const numCourts = feeConfig.numCourts || 1;
       const rentalHours = feeConfig.rentalHours || 1;
       const totalCourtFee = (feeConfig.courtFeeAmount ?? 0) * numCourts * rentalHours;
-      
-      // Count active players
-      const activePlayers = players.filter(p => p.gamesPlayed > 0).length;
-      const perPlayerFee = activePlayers > 0 ? totalCourtFee / activePlayers : 0;
       
       return (
         <div className="mb-4 p-3 bg-yellow-50 rounded border border-yellow-200 text-yellow-900 text-sm flex flex-col md:flex-row md:items-center gap-1">

@@ -7,11 +7,40 @@ import { useParams } from 'next/navigation';
 import { GiShuttlecock } from "react-icons/gi";
 import { formatTime } from '@/lib/utils';
 
+// Define types for your data structure
+interface Player {
+  id: string;
+  name: string;
+  skillLevel: 'beginner' | 'intermediate' | 'advanced';
+}
+
+interface Court {
+  id: string;
+  status: 'occupied' | 'available';
+  isDoubles: boolean;
+  startTime?: string;
+  players?: string[];
+}
+
+interface QueueItem {
+  id: string;
+  isDoubles: boolean;
+  requestedTime: string;
+  playerIds: string[];
+}
+
+interface QueueData {
+  queue: QueueItem[];
+  players: Player[];
+  courts: Court[];
+  lastUpdated?: string;
+}
+
 export default function SharedQueueView() {
   const params = useParams();
   const queueId = params.queueId as string;
   
-  const [queueData, setQueueData] = useState<any>(null);
+  const [queueData, setQueueData] = useState<QueueData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<string | null>(null);
@@ -26,13 +55,11 @@ export default function SharedQueueView() {
     
     const queueRef = ref(database, `queues/${queueId}`);
     
-    // Listen for real-time updates
     const unsubscribe = onValue(queueRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
         
-        // Ensure queue and other critical properties exist
-        const safeData = {
+        const safeData: QueueData = {
           ...data,
           queue: data.queue || [],
           players: data.players || [],
@@ -63,8 +90,8 @@ export default function SharedQueueView() {
     const now = new Date().getTime();
     const diffMs = now - startTime;
     
-    const minutes = Math.floor(diffMs / 60000); // Convert ms to minutes
-    const seconds = Math.floor((diffMs % 60000) / 1000); // Remaining seconds
+    const minutes = Math.floor(diffMs / 60000);
+    const seconds = Math.floor((diffMs % 60000) / 1000);
     
     return `${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
   };
@@ -91,7 +118,6 @@ export default function SharedQueueView() {
     );
   }
 
-  // Safety check for rendering - if queue data isn't loaded yet or structured correctly
   if (!queueData || !Array.isArray(queueData.queue) || !Array.isArray(queueData.courts)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -121,9 +147,9 @@ export default function SharedQueueView() {
         
         {/* Current Courts */}
         <div className="mb-8">
-          <h2 className="text-md font-semibold mb-4">Currently Playing</h2>
+          <h2 className="font-semibold mb-2">Currently Playing</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {queueData.courts.map((court: any) => (
+            {queueData.courts.map((court: Court) => (
               <div 
                 key={court.id} 
                 className={`p-4 rounded-lg transition-all duration-300 ${
@@ -138,11 +164,11 @@ export default function SharedQueueView() {
                     </p>
                     
                     <p className="text-sm font-medium mb-1">
-                      <span className="font-normal">Started:</span> {formatTime(court.startTime)}
+                      <span className="font-normal">Started:</span> {court.startTime ? formatTime(court.startTime) : 'N/A'}
                     </p>
                     
                     <p className="text-sm font-medium mb-3">
-                      <span className="font-normal">Elapsed:</span> {formatElapsedTime(court.startTime)}
+                      <span className="font-normal">Elapsed:</span> {court.startTime ? formatElapsedTime(court.startTime) : 'N/A'}
                     </p>
                     
                     {/* Player display */}
@@ -151,29 +177,29 @@ export default function SharedQueueView() {
                         {court.isDoubles && court.players.length === 4 ? (
                           <div className="flex items-center justify-between text-sm">
                             <div className="text-blue-800 font-medium">
-                              {queueData.players.find((p: any) => p.id === court.players[0])?.name} & {' '}
-                              {queueData.players.find((p: any) => p.id === court.players[1])?.name}
+                              {queueData.players.find((p: Player) => p.id === court.players?.[0])?.name} & {' '}
+                              {queueData.players.find((p: Player) => p.id === court.players?.[1])?.name}
                             </div>
                             <div className="text-xs px-1.5 py-0.5 bg-gray-200 text-[9px] rounded-full font-bold">vs</div>
                             <div className="text-red-800 font-medium">
-                              {queueData.players.find((p: any) => p.id === court.players[2])?.name} & {' '}
-                              {queueData.players.find((p: any) => p.id === court.players[3])?.name}
+                              {queueData.players.find((p: Player) => p.id === court.players?.[2])?.name} & {' '}
+                              {queueData.players.find((p: Player) => p.id === court.players?.[3])?.name}
                             </div>
                           </div>
                         ) : court.players.length === 2 ? (
                           <div className="flex items-center justify-between text-sm">
                             <div className="text-blue-800 font-medium">
-                              {queueData.players.find((p: any) => p.id === court.players[0])?.name}
+                              {queueData.players.find((p: Player) => p.id === court.players?.[0])?.name}
                             </div>
                             <div className="text-xs px-1.5 py-0.5 bg-gray-200 text-[9px] rounded-full font-bold">vs</div>
                             <div className="text-red-800 font-medium">
-                              {queueData.players.find((p: any) => p.id === court.players[1])?.name}
+                              {queueData.players.find((p: Player) => p.id === court.players?.[1])?.name}
                             </div>
                           </div>
                         ) : (
                           <p className="text-sm text-gray-500">
                             Players: {court.players.map((pId: string) => {
-                              const player = queueData.players.find((p: any) => p.id === pId);
+                              const player = queueData.players.find((p: Player) => p.id === pId);
                               return player ? player.name : 'Unknown';
                             }).join(', ')}
                           </p>
@@ -189,7 +215,7 @@ export default function SharedQueueView() {
           </div>
         </div>
         
-        {/* Queue List - Now safely using queue which is guaranteed to be an array */}
+        {/* Queue List */}
         <div>
           <h2 className="text-xl font-semibold mb-4">Queue</h2>
           {queueData.queue.length === 0 ? (
@@ -200,7 +226,7 @@ export default function SharedQueueView() {
             </div>
           ) : (
             <div className="space-y-3">
-              {queueData.queue.map((item: any, index: number) => (
+              {queueData.queue.map((item: QueueItem, index: number) => (
                 <div key={item.id} className="border rounded-md p-3 bg-[#ebf4ff] shadow-md">
                   <div className="flex justify-between items-start mb-3">
                     <div>
@@ -222,19 +248,19 @@ export default function SharedQueueView() {
                           <div className="flex items-center justify-between capitalize">
                             <div className="text-sm font-medium text-blue-800 text-left">
                               <span className="block">
-                                {queueData.players.find((p: any) => p.id === item.playerIds[0])?.name}
+                                {queueData.players.find((p: Player) => p.id === item.playerIds[0])?.name}
                               </span>
                               <span className="block mt-1">
-                                {queueData.players.find((p: any) => p.id === item.playerIds[1])?.name}
+                                {queueData.players.find((p: Player) => p.id === item.playerIds[1])?.name}
                               </span>
                             </div>
                             <div className="text-xs px-2 py-1 bg-gray-200 text-[9px] rounded-full font-bold uppercase">vs</div>
                             <div className="text-sm font-medium text-green-800 text-right">
                               <span className="block">
-                                {queueData.players.find((p: any) => p.id === item.playerIds[2])?.name}
+                                {queueData.players.find((p: Player) => p.id === item.playerIds[2])?.name}
                               </span>
                               <span className="block mt-1">
-                                {queueData.players.find((p: any) => p.id === item.playerIds[3])?.name}
+                                {queueData.players.find((p: Player) => p.id === item.playerIds[3])?.name}
                               </span>
                             </div>
                           </div>
@@ -247,11 +273,11 @@ export default function SharedQueueView() {
                         <div className="text-center px-3 py-2 bg-white rounded-md border border-gray-300 w-full">
                           <div className="flex items-center justify-between capitalize">
                             <div className="text-sm font-medium text-blue-800">
-                              {queueData.players.find((p: any) => p.id === item.playerIds[0])?.name}
+                              {queueData.players.find((p: Player) => p.id === item.playerIds[0])?.name}
                             </div>
                             <div className="text-xs px-2 py-1 bg-gray-200 text-[9px] rounded-full font-bold uppercase">vs</div>
                             <div className="text-sm font-medium text-green-800">
-                              {queueData.players.find((p: any) => p.id === item.playerIds[1])?.name}
+                              {queueData.players.find((p: Player) => p.id === item.playerIds[1])?.name}
                             </div>
                           </div>
                         </div>
@@ -262,7 +288,7 @@ export default function SharedQueueView() {
                       <h4 className="text-sm font-medium mb-1">Players:</h4>
                       <div className="grid grid-cols-2 gap-2">
                         {(item.playerIds || []).map((pId: string) => {
-                          const player = queueData.players.find((p: any) => p.id === pId);
+                          const player = queueData.players.find((p: Player) => p.id === pId);
                           if (!player) return null;
                           
                           return (

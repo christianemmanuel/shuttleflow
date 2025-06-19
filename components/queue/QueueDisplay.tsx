@@ -10,9 +10,10 @@ import Modal from '@/components/ui/Modal';
 import { GiShuttlecock } from "react-icons/gi";
 import { TbAlertTriangle } from "react-icons/tb";
 import { FaLink, FaStopCircle, FaCopy, FaQrcode } from "react-icons/fa";
-import { ref, set, remove, onDisconnect, get } from 'firebase/database';
+import { ref, set, remove, get } from 'firebase/database';
 import { database } from '@/lib/firebase';
 import { nanoid } from 'nanoid';
+import {QRCodeSVG} from 'qrcode.react';
 
 interface QueueItemProps {
   queueItem: QueueItemType;
@@ -356,8 +357,6 @@ export default function QueueDisplay() {
         lastUpdated: new Date().toISOString()
       });
       
-      // Create shareable URL
-      const url = `${window.location.origin}/shared-queue/${newShareId}`;
       setIsSharing(true);
       
       // Store in localStorage
@@ -553,18 +552,15 @@ export default function QueueDisplay() {
           <div className="flex flex-col items-center">
             <div className="bg-white p-3 rounded-lg mb-3">
               {/* This will be replaced with actual QR code component */}
-              <div className="bg-gray-100 w-64 h-64 flex items-center justify-center">
+              <div className="bg-gray-100 flex items-center justify-center">
                 {/* Replace this with actual QR code component */}
-                <p className="text-center text-sm text-gray-500">
-                  To use QR codes, install a QR code library like:<br />
-                  <code className="bg-gray-200 px-1 py-0.5 rounded">npm install qrcode.react</code><br />
-                  Then replace this placeholder with:<br />
-                  <code className="bg-gray-200 px-1 py-0.5 rounded">&lt;QRCode value=&#123;shareUrl&#125; size=&#123;250&#125; /&gt;</code>
-                </p>
+                <div className="mt-3 flex justify-center">
+                  <QRCodeSVG value={shareUrl} size={170} />
+                </div>
               </div>
             </div>
             <p className="text-sm text-gray-600 mb-2">
-              Scan this code with your phone's camera to view the queue
+              Scan this code with your phone&apos;s camera to view the queue
             </p>
             <button
               onClick={handleCopyLink}
