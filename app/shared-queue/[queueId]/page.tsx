@@ -6,6 +6,9 @@ import { ref, onValue } from 'firebase/database';
 import { useParams } from 'next/navigation';
 import { GiShuttlecock } from "react-icons/gi";
 import { formatTime } from '@/lib/utils';
+import useModal from '@/hooks/useModal';
+import Modal from '@/components/ui/Modal';
+import Link from 'next/link';
 
 // Define types for your data structure
 interface Player {
@@ -46,6 +49,8 @@ export default function SharedQueueView() {
   const [lastUpdate, setLastUpdate] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
+  const showCurrentlyPlaying = useModal();
+  
   useEffect(() => {
     if (!queueId) {
       setError("Invalid queue ID");
@@ -82,19 +87,6 @@ export default function SharedQueueView() {
     
     return () => unsubscribe();
   }, [queueId]);
-
-  const formatElapsedTime = (startTimeStr: string) => {
-    if (!startTimeStr) return "N/A";
-    
-    const startTime = new Date(startTimeStr).getTime();
-    const now = new Date().getTime();
-    const diffMs = now - startTime;
-    
-    const minutes = Math.floor(diffMs / 60000);
-    const seconds = Math.floor((diffMs % 60000) / 1000);
-    
-    return `${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
-  };
 
   if (loading) {
     return (
@@ -134,43 +126,41 @@ export default function SharedQueueView() {
 
   return (
     <div className="max-w-4xl mx-auto p-4">
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">Badminton Queue</h1>
-          
-          {lastUpdate && (
-            <div className={`text-sm text-gray-600 ${refreshing ? 'bg-green-100 text-green-700 px-2 py-1 rounded animate-pulse' : ''}`}>
-              Last updated: {lastUpdate}
-            </div>
-          )}
-        </div>
+      <div className="flex items-center justify-center mb-4">
+        <a href="/"className='flex items-center gap-[0.15rem] text-white font-semibold text-[18px] cursor-pointer'>ShuttleFlow <GiShuttlecock className='rotate-[205deg]' /></a>
+      </div>
+      
+      <div className="bg-white p-4 rounded-lg shadow-md mb-5">
+        {lastUpdate && (
+          <div className={`text-[13px] mb-2.5 bg-green-100 text-green-700 px-2 py-1 ${refreshing ? 'bg-red-200 text-red-400 px-2 py-1 rounded animate-pulse' : ''}`}>
+            Last updated: {lastUpdate}
+          </div>
+        )}
         
-        {/* Current Courts */}
-        <div className="mb-8">
-          <h2 className="font-semibold mb-2">Currently Playing</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Modal
+          isOpen={showCurrentlyPlaying.isOpen}
+          onClose={showCurrentlyPlaying.closeModal}
+          maxWidth="full"
+          title="Now Playing on Court"
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {queueData.courts.map((court: Court) => (
               <div 
                 key={court.id} 
-                className={`p-4 rounded-lg transition-all duration-300 ${
-                  court.status === 'occupied' ? 'bg-green-100' : 'bg-gray-100'
+                className={`relative z-1 sm:p-4 p-3 h-full flex flex-col rounded-lg border border-[#e7d58b]  transition-all duration-300 ${
+                  court.status === 'occupied' ? 'bg-amber-50' : 'bg-gray-100 border-gray-300'
                 }`}
               >
-                <h3 className="font-bold">Court {court.id}</h3>
+                <h3 className="font-bold flex justify-between items-center mb-2.5">
+                  Court #{court.id}
+                  {court.status === 'occupied' && (
+                    <>
+                      <span className="font-normal ml-2 text-gray-600">Started: {court.startTime && formatTime(court.startTime)}</span> 
+                    </>
+                  )}
+                </h3>
                 {court.status === 'occupied' ? (
                   <div>
-                    <p className="text-sm font-medium mb-1">
-                      <span className="font-normal">Game Type:</span> {court.isDoubles ? 'Doubles' : 'Singles'}
-                    </p>
-                    
-                    <p className="text-sm font-medium mb-1">
-                      <span className="font-normal">Started:</span> {court.startTime ? formatTime(court.startTime) : 'N/A'}
-                    </p>
-                    
-                    <p className="text-sm font-medium mb-3">
-                      <span className="font-normal">Elapsed:</span> {court.startTime ? formatElapsedTime(court.startTime) : 'N/A'}
-                    </p>
-                    
                     {/* Player display */}
                     {court.players && court.players.length > 0 && (
                       <div className="bg-white rounded-md p-2 border border-green-200">
@@ -213,16 +203,24 @@ export default function SharedQueueView() {
               </div>
             ))}
           </div>
-        </div>
+        </Modal>
         
         {/* Queue List */}
         <div>
-          <h2 className="text-xl font-semibold mb-4">Queue</h2>
+          <h2 className="md:text-lg text-sm font-bold flex items-center justify-between mb-4">
+            <span>Queue</span> 
+            <button 
+            onClick={showCurrentlyPlaying.openModal} 
+            className='bg-blue-500 text-[13px] hover:bg-blue-600 text-white gap-1.5 py-1.5 px-3 rounded w-auto cursor-pointer flex items-center justify-center transition relative border-b-[4px] border-b-blue-700 hover:border-b-blue-800 active:border-b-blue-900 active:translate-y-[2px]'
+          >
+            Show Court Status
+          </button>
+          </h2>
           {queueData.queue.length === 0 ? (
             <div className="text-center py-8 bg-gray-50 rounded-lg">
               <GiShuttlecock size="3em" className="text-gray-600 mx-auto" />
               <h3 className="mt-2 text-sm font-medium text-gray-900">No players in queue</h3>
-              <p className="mt-1 text-sm text-gray-500">The queue is currently empty</p>
+              <p className="mt-1 text-sm text-gray-500">Please wait for the queue master to add players.</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -242,43 +240,31 @@ export default function SharedQueueView() {
                   
                   {/* Show players in format similar to main app */}
                   {item.isDoubles && item.playerIds && item.playerIds.length === 4 ? (
-                    <div className="mb-3">
-                      <div className="flex items-center justify-center mt-2">
-                        <div className="text-center px-3 py-2 bg-white rounded-md border border-gray-300 w-full">
-                          <div className="flex items-center justify-between capitalize">
-                            <div className="text-sm font-medium text-blue-800 text-left">
-                              <span className="block">
-                                {queueData.players.find((p: Player) => p.id === item.playerIds[0])?.name}
-                              </span>
-                              <span className="block mt-1">
-                                {queueData.players.find((p: Player) => p.id === item.playerIds[1])?.name}
-                              </span>
-                            </div>
-                            <div className="text-xs px-2 py-1 bg-gray-200 text-[9px] rounded-full font-bold uppercase">vs</div>
-                            <div className="text-sm font-medium text-green-800 text-right">
-                              <span className="block">
-                                {queueData.players.find((p: Player) => p.id === item.playerIds[2])?.name}
-                              </span>
-                              <span className="block mt-1">
-                                {queueData.players.find((p: Player) => p.id === item.playerIds[3])?.name}
-                              </span>
-                            </div>
+                    <div className="flex items-center justify-center mt-2 mb-2">
+                      <div className="text-center sm:px-3 sm:py-2 py-2 px-2.5 bg-white rounded-md border border-gray-300 w-full">
+                        <div className="flex items-center justify-between capitalize sm:flex-row flex-row sm:gap-0.5 gap-2.5">
+                          <div className="text-sm font-medium text-blue-800 text-left">
+                            <span className='block'>{queueData.players.find((p: Player) => p.id === item.playerIds[0])?.name}</span>
+                            <span className='block mt-1'>{queueData.players.find((p: Player) => p.id === item.playerIds[1])?.name}</span>
+                          </div>
+                          <div className="text-xs px-2 py-1 bg-gray-200 text-[9px] rounded-full font-bold uppercase">vs</div>
+                          <div className="text-sm font-medium text-green-800 text-left">
+                            <span className='block'>{queueData.players.find((p: Player) => p.id === item.playerIds[2])?.name}</span>
+                            <span className='block mt-1'>{queueData.players.find((p: Player) => p.id === item.playerIds[3])?.name}</span>
                           </div>
                         </div>
                       </div>
                     </div>
                   ) : !item.isDoubles && item.playerIds && item.playerIds.length === 2 ? (
-                    <div className="mb-3">
-                      <div className="flex items-center justify-center mt-2">
-                        <div className="text-center px-3 py-2 bg-white rounded-md border border-gray-300 w-full">
-                          <div className="flex items-center justify-between capitalize">
-                            <div className="text-sm font-medium text-blue-800">
-                              {queueData.players.find((p: Player) => p.id === item.playerIds[0])?.name}
-                            </div>
-                            <div className="text-xs px-2 py-1 bg-gray-200 text-[9px] rounded-full font-bold uppercase">vs</div>
-                            <div className="text-sm font-medium text-green-800">
-                              {queueData.players.find((p: Player) => p.id === item.playerIds[1])?.name}
-                            </div>
+                    <div className="flex items-center justify-center mt-2 mb-2">
+                      <div className="text-center sm:px-3 sm:py-2 py-3 px-2.5 bg-white rounded-md border border-gray-300 w-full">
+                        <div className="flex items-center justify-between capitalize sm:flex-row flex-row">
+                          <div className="text-sm font-medium text-blue-800">
+                            {queueData.players.find((p: Player) => p.id === item.playerIds[0])?.name}
+                          </div>
+                          <div className="text-xs px-2 py-1 bg-gray-200 text-[9px] rounded-full font-bold uppercase">vs</div>
+                          <div className="text-sm font-medium text-green-800">
+                            {queueData.players.find((p: Player) => p.id === item.playerIds[1])?.name}
                           </div>
                         </div>
                       </div>
@@ -314,7 +300,7 @@ export default function SharedQueueView() {
         </div>
       </div>
       
-      <div className="mt-6 text-center text-gray-500 text-sm">
+      <div className="mt-6 mb-5 text-center text-white text-sm">
         <p>Queue last updated: {new Date(queueData.lastUpdated || Date.now()).toLocaleString()}</p>
         <p className="mt-1">This page updates automatically when changes occur.</p>
       </div>

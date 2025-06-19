@@ -75,7 +75,7 @@ const QueueItem = ({
       
       return (
         <div className="mb-5">
-          <div className="flex items-center justify-center mt-2 mb-3 ">
+          <div className="flex items-center justify-center mt-2 mb-3">
             <div className="text-center sm:px-3 sm:py-2 py-2 px-2.5 bg-white rounded-md border border-gray-300 w-full">
               <div className="flex items-center justify-between capitalize sm:flex-row flex-row sm:gap-0.5 gap-2.5">
                 <div className="text-sm font-medium text-blue-800 text-left">
@@ -147,7 +147,7 @@ const QueueItem = ({
             {queueItem.isDoubles ? 'Doubles' : 'Singles'} Match
           </span>
         </div>
-        <span className="text-xs text-gray-500 mt-[3px]">
+        <span className="text-xs text-gray-500">
           Requested {formatTime(queueItem.requestedTime)}
         </span>
       </div>
@@ -502,7 +502,7 @@ export default function QueueDisplay() {
             />
             <button
               onClick={handleCopyLink}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-r-md flex items-center"
+              className="bg-blue-500 hover:bg-blue-600 text-white py-1.5 px-4 rounded-r-md flex items-center"
               title="Copy Link"
             >
               <FaCopy size={14} />

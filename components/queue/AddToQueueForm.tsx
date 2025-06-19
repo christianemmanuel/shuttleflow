@@ -14,6 +14,7 @@ import { MdOutlineRadioButtonChecked } from "react-icons/md";
 import { CgSearch } from "react-icons/cg";
 
 import AddPlayerForm from '@/components/players/AddPlayerForm';
+import ClientQueueDisplay from '@/components/queue/ClientQueueDisplay';
 
 export default function AddToQueueForm() {
   const { state, addPlayerToQueue, markPlayersAsDonePlaying, isPlayerInQueue } = useData();
@@ -337,6 +338,7 @@ export default function AddToQueueForm() {
                   Remove player
                 </button>
               </div>
+             <div className='hidden'><ClientQueueDisplay /></div>
 
               <Modal
                 isOpen={alertModalDonePlay.isOpen}

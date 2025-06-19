@@ -156,7 +156,7 @@ export default function Modal({
 
   return createPortal(
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/65 px-3 sm:px-4 transition-opacity duration-300 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/65 px-3 sm:px-4 transition-opacity duration-300 overflow-y-auto ${
         isAnimating ? 'pointer-events-none' : ''
       }`}
       onClick={handleBackdropClick}

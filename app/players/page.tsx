@@ -2,7 +2,6 @@
 
 import AddToQueueForm from '@/components/queue/AddToQueueForm';
 import QueueDisplay from '@/components/queue/QueueDisplay';
-import ClientQueueDisplay from '@/components/queue/ClientQueueDisplay';
 import MatchHistory from '@/components/history/MatchHistory';
 import React, { useState, useEffect } from 'react';
 import { useData } from '@/context/DataContext';
@@ -82,7 +81,6 @@ const Queue = () => {
       </div>
       
       {/* Tab Content - Updated with MatchHistory */}
-      <div className='fixed top-[9999px] w-0 h-0 left-[99999px]'><ClientQueueDisplay /></div>
       <div className="mt-4">
         {activeTab === 'players' && <AddToQueueForm /> }
         {activeTab === 'queue' && <QueueDisplay />}

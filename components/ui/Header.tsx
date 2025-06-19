@@ -18,6 +18,14 @@ export default function Header() {
   // State to control whether the court notification should be shown
   const [showCourtNotification, setShowCourtNotification] = useState(false);
 
+  // Check if the current page is a shared queue page
+  const isSharedQueuePage = pathname?.includes('/shared-queue/');
+  
+  // If we're on a shared queue page, don't render the header
+  if (isSharedQueuePage) {
+    return null;
+  }
+
   // Helper function to determine if link is active
   const isActive = (path: string) => pathname === path;
   
