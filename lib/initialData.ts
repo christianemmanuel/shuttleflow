@@ -18,7 +18,7 @@ export const initialFeeConfig: FeeConfig = {
   currency: 'PHP',
   autoCalculate: true,
   requirePayment: false,
-  courtFeeType: "perHour",     // default
+  courtFeeType: "perHead",     // default
   courtFeeAmount: 0,
   numCourts: 1
 };

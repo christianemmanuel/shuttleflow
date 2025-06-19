@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useData } from '@/context/DataContext';
 import { formatTime } from '@/lib/utils';
 import { Player, Court, QueueItem as QueueItemType } from '@/types';
@@ -9,6 +9,10 @@ import useModal from '@/hooks/useModal';
 import Modal from '@/components/ui/Modal';
 import { GiShuttlecock } from "react-icons/gi";
 import { TbAlertTriangle } from "react-icons/tb";
+import { FaLink, FaStopCircle, FaCopy, FaQrcode } from "react-icons/fa";
+import { ref, set, remove, onDisconnect, get } from 'firebase/database';
+import { database } from '@/lib/firebase';
+import { nanoid } from 'nanoid';
 
 interface QueueItemProps {
   queueItem: QueueItemType;
@@ -18,7 +22,7 @@ interface QueueItemProps {
   onRemoveFromQueue: (queueId: string) => void;
 }
 
-// New QueueItem component that manages its own modal
+// QueueItem component that manages its own modal
 const QueueItem = ({ 
   queueItem, 
   index,
@@ -27,7 +31,7 @@ const QueueItem = ({
   onRemoveFromQueue 
 }: QueueItemProps ) => {
   const alertModal = useModal();
-  const warningModal = useModal(); // New modal for player already playing warning
+  const warningModal = useModal(); // Modal for player already playing warning
   const { showToast } = useToast();
   const { state } = useData();
   const { players } = state;
@@ -159,7 +163,7 @@ const QueueItem = ({
               <button
                 key={court.id}
                 onClick={() => handleAssignToCourt(court.id)}
-                                className="bg-blue-500 hover:bg-blue-600 border-b-[4px] border-b-blue-700 text-white py-1.5 px-3 rounded sm:text-sm text-[13px] cursor-pointer transition"
+                className="bg-blue-500 hover:bg-blue-600 border-b-[4px] border-b-blue-700 text-white py-1.5 px-3 rounded sm:text-sm text-[13px] cursor-pointer transition"
               >
                 Court {court.id}
               </button>
@@ -253,7 +257,183 @@ export default function QueueDisplay() {
   const { queue, courts } = state;
   const { showToast } = useToast();
   
+  // Load sharing state from localStorage on initial render
+  const [shareId, setShareId] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('queueShareId');
+    }
+    return null;
+  });
+  
+  const [isSharing, setIsSharing] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('queueIsSharing') === 'true';
+    }
+    return false;
+  });
+  
+  const [isCreatingLink, setIsCreatingLink] = useState(false);
+  const [showQRCode, setShowQRCode] = useState(false);
+  const qrModal = useModal();
+  
+  // Calculate share URL based on shareId
+  const shareUrl = shareId 
+    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/shared-queue/${shareId}` 
+    : null;
+  
   const availableCourts = courts.filter(court => court.status === 'available');
+  
+  // Persist sharing state to localStorage whenever it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (shareId) {
+        localStorage.setItem('queueShareId', shareId);
+      } else {
+        localStorage.removeItem('queueShareId');
+      }
+      
+      localStorage.setItem('queueIsSharing', isSharing.toString());
+    }
+  }, [shareId, isSharing]);
+  
+  // Verify that the shared queue still exists in Firebase on initial load
+  useEffect(() => {
+    const verifySharedQueue = async () => {
+      if (isSharing && shareId) {
+        try {
+          const queueRef = ref(database, `queues/${shareId}`);
+          const snapshot = await get(queueRef);
+          
+          if (!snapshot.exists()) {
+            // Queue no longer exists, reset sharing state
+            setIsSharing(false);
+            setShareId(null);
+            localStorage.removeItem('queueShareId');
+            localStorage.removeItem('queueIsSharing');
+          } else {
+            // Queue exists, make sure it stays updated with current data
+            await set(queueRef, {
+              queue: queue,
+              players: state.players,
+              courts: courts,
+              lastUpdated: new Date().toISOString()
+            });
+          }
+        } catch (error) {
+          console.error("Error verifying shared queue:", error);
+          // Reset sharing state on error
+          setIsSharing(false);
+          setShareId(null);
+          localStorage.removeItem('queueShareId');
+          localStorage.removeItem('queueIsSharing');
+        }
+      }
+    };
+    
+    verifySharedQueue();
+  }, [isSharing, shareId, queue, courts, state.players]);
+  
+  // Create a shareable link
+  const handleCreateLink = async () => {
+    if (queue.length === 0) {
+      showToast('No players in queue to share', 'error');
+      return;
+    }
+    
+    setIsCreatingLink(true);
+    try {
+      // Generate a short, unique ID
+      const newShareId = nanoid(6);
+      setShareId(newShareId);
+      
+      // Save current queue state to Firebase
+      const queueRef = ref(database, `queues/${newShareId}`);
+      await set(queueRef, {
+        queue: queue,
+        players: state.players,
+        courts: courts,
+        createdAt: new Date().toISOString(),
+        lastUpdated: new Date().toISOString()
+      });
+      
+      // Create shareable URL
+      const url = `${window.location.origin}/shared-queue/${newShareId}`;
+      setIsSharing(true);
+      
+      // Store in localStorage
+      localStorage.setItem('queueShareId', newShareId);
+      localStorage.setItem('queueIsSharing', 'true');
+      
+      showToast('Queue link created!', 'success');
+    } catch (error) {
+      console.error("Error creating shareable link:", error);
+      showToast('Failed to create share link', 'error');
+    } finally {
+      setIsCreatingLink(false);
+    }
+  };
+  
+  // Stop sharing the queue
+  const handleStopSharing = async () => {
+    if (!shareId) return;
+    
+    try {
+      // Remove the shared queue data from Firebase
+      const queueRef = ref(database, `queues/${shareId}`);
+      await remove(queueRef);
+      
+      setShareId(null);
+      setIsSharing(false);
+      
+      // Clear from localStorage
+      localStorage.removeItem('queueShareId');
+      localStorage.removeItem('queueIsSharing');
+      
+      showToast('Queue sharing stopped', 'info');
+    } catch (error) {
+      console.error("Error stopping sharing:", error);
+      showToast('Error stopping queue sharing', 'error');
+    }
+  };
+  
+  // Copy link to clipboard
+  const handleCopyLink = async () => {
+    if (!shareUrl) return;
+    
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      showToast('Link copied to clipboard!', 'success');
+    } catch (error) {
+      showToast('Failed to copy link', 'error');
+    }
+  };
+  
+  // Show QR code modal
+  const handleShowQRCode = () => {
+    setShowQRCode(true);
+    qrModal.openModal();
+  };
+  
+  // Update Firebase when queue changes while sharing
+  useEffect(() => {
+    if (isSharing && shareId) {
+      const updateSharedQueue = async () => {
+        try {
+          const queueRef = ref(database, `queues/${shareId}`);
+          await set(queueRef, {
+            queue: queue,
+            players: state.players,
+            courts: courts,
+            lastUpdated: new Date().toISOString()
+          });
+        } catch (error) {
+          console.error("Error updating shared queue:", error);
+        }
+      };
+      
+      updateSharedQueue();
+    }
+  }, [queue, courts, state.players, isSharing, shareId]);
   
   const handleAssignMatch = (queueId: string, playerIds: string[], selectedCourtId?: number) => {
     const courtId = selectedCourtId || (availableCourts.length > 0 ? availableCourts[0].id : null);
@@ -273,11 +453,71 @@ export default function QueueDisplay() {
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-md mb-5">
-      {queue.length > 0 && (
-        <div className="flex justify-between items-center sm:mb-3 mb-2">
-          <span className="text-sm text-gray-500">
-            {queue.length} {queue.length === 1 ? 'match' : 'matches'} waiting
-          </span>
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center">
+          <h2 className="text-lg font-bold mr-3">Queue</h2>
+          {queue.length > 0 && (
+            <span className="text-sm text-gray-500">
+              {queue.length} {queue.length === 1 ? 'match' : 'matches'} waiting
+            </span>
+          )}
+        </div>
+        
+        {/* Sharing Controls */}
+        <div className="flex space-x-2">
+          {!isSharing ? (
+            <button
+              onClick={handleCreateLink}
+              disabled={isCreatingLink || queue.length === 0}
+              className={`flex items-center space-x-1 px-3 py-1.5 rounded text-sm ${
+                queue.length === 0 
+                  ? 'bg-gray-300 cursor-not-allowed text-gray-500' 
+                  : 'bg-blue-500 hover:bg-blue-600 text-white'
+              }`}
+            >
+              <FaLink size={14} />
+              <span>{isCreatingLink ? 'Creating...' : 'Create Link'}</span>
+            </button>
+          ) : (
+            <button
+              onClick={handleStopSharing}
+              className="flex items-center space-x-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-sm"
+            >
+              <FaStopCircle size={14} />
+              <span>Stop Sharing</span>
+            </button>
+          )}
+        </div>
+      </div>
+      
+      {/* Share URL Display */}
+      {isSharing && shareUrl && (
+        <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+          <p className="text-sm font-medium text-blue-800 mb-2">Share this link with players:</p>
+          <div className="flex">
+            <input
+              type="text"
+              readOnly
+              value={shareUrl}
+              className="flex-1 text-sm border border-gray-300 rounded-l-md px-2 py-1.5 bg-white"
+            />
+            <button
+              onClick={handleCopyLink}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-r-md flex items-center"
+              title="Copy Link"
+            >
+              <FaCopy size={14} />
+            </button>
+          </div>
+          <div className="mt-2 flex justify-end">
+            <button
+              onClick={handleShowQRCode}
+              className="flex items-center space-x-1 text-blue-600 hover:text-blue-800 text-sm"
+            >
+              <FaQrcode size={14} />
+              <span>Show QR Code</span>
+            </button>
+          </div>
         </div>
       )}
   
@@ -301,6 +541,41 @@ export default function QueueDisplay() {
           ))}
         </div>
       )}
+      
+      {/* QR Code Modal */}
+      <Modal
+        isOpen={qrModal.isOpen}
+        onClose={qrModal.closeModal}
+        title="Scan to View Queue"
+        maxWidth="sm"
+      >
+        {shareUrl && (
+          <div className="flex flex-col items-center">
+            <div className="bg-white p-3 rounded-lg mb-3">
+              {/* This will be replaced with actual QR code component */}
+              <div className="bg-gray-100 w-64 h-64 flex items-center justify-center">
+                {/* Replace this with actual QR code component */}
+                <p className="text-center text-sm text-gray-500">
+                  To use QR codes, install a QR code library like:<br />
+                  <code className="bg-gray-200 px-1 py-0.5 rounded">npm install qrcode.react</code><br />
+                  Then replace this placeholder with:<br />
+                  <code className="bg-gray-200 px-1 py-0.5 rounded">&lt;QRCode value=&#123;shareUrl&#125; size=&#123;250&#125; /&gt;</code>
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 mb-2">
+              Scan this code with your phone's camera to view the queue
+            </p>
+            <button
+              onClick={handleCopyLink}
+              className="flex items-center space-x-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-sm"
+            >
+              <FaCopy size={14} />
+              <span>Copy Link</span>
+            </button>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

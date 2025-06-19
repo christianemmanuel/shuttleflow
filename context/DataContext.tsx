@@ -10,12 +10,12 @@ import {
 } from '@/lib/localStorage';
 import {
   addPlayer,
-  // We'll implement queue functions directly in the context
-  // addToQueue,
-  // removeFromQueue,
   suggestNextMatch,
   generateId
 } from '@/lib/utils';
+import { ref, set, remove, get, onDisconnect } from 'firebase/database';
+import { database } from '@/lib/firebase';
+import { nanoid } from 'nanoid';
 
 interface DataContextType {
   state: AppState;
@@ -33,6 +33,14 @@ interface DataContextType {
   markPlayerAsDonePlaying: (playerId: string) => void;
   markPlayersAsDonePlaying: (playerIds: string[]) => void;
   isPlayerInQueue: (playerId: string) => boolean;
+  // Sharing functions
+  createShareableLink: () => Promise<string>;
+  stopSharing: () => Promise<void>;
+  isSharing: boolean;
+  shareId: string | null;
+  shareUrl: string | null;
+  updateFirebaseQueue: () => Promise<boolean>;
+  setInitialSharingState: (shareId: string, isSharing: boolean) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -40,6 +48,26 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [state, setState] = useState<AppState>(initialAppState);
   const [isInitialized, setIsInitialized] = useState(false);
+
+  // Sharing state - load from localStorage on initial render
+  const [shareId, setShareId] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('queueShareId');
+    }
+    return null;
+  });
+  
+  const [isSharing, setIsSharing] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('queueIsSharing') === 'true';
+    }
+    return false;
+  });
+
+  // Calculate share URL based on shareId
+  const shareUrl = shareId 
+    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/shared-queue/${shareId}` 
+    : null;
 
   // Load data from localStorage on first render
   useEffect(() => {
@@ -55,32 +83,152 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [state, isInitialized]);
 
+  // Persist sharing state to localStorage whenever it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (shareId) {
+        localStorage.setItem('queueShareId', shareId);
+      } else {
+        localStorage.removeItem('queueShareId');
+      }
+      
+      localStorage.setItem('queueIsSharing', isSharing.toString());
+    }
+  }, [shareId, isSharing]);
+
+  // Verify that the shared queue still exists in Firebase on initial load
+  useEffect(() => {
+    const verifySharedQueue = async () => {
+      if (isSharing && shareId) {
+        try {
+          const queueRef = ref(database, `queues/${shareId}`);
+          const snapshot = await get(queueRef);
+          
+          if (!snapshot.exists()) {
+            // Queue no longer exists, reset sharing state
+            setIsSharing(false);
+            setShareId(null);
+            localStorage.removeItem('queueShareId');
+            localStorage.removeItem('queueIsSharing');
+          } else {
+            // Queue exists, make sure it stays updated with current data
+            await set(queueRef, {
+              queue: state.queue,
+              players: state.players,
+              courts: state.courts,
+              lastUpdated: new Date().toISOString()
+            });
+          }
+        } catch (error) {
+          console.error("Error verifying shared queue:", error);
+          // Reset sharing state on error
+          setIsSharing(false);
+          setShareId(null);
+          localStorage.removeItem('queueShareId');
+          localStorage.removeItem('queueIsSharing');
+        }
+      }
+    };
+    
+    if (isInitialized) {
+      verifySharedQueue();
+    }
+  }, [isInitialized, isSharing, shareId, state]);
+
+  // Function to update Firebase with current state
+  const updateFirebaseQueue = async () => {
+    if (isSharing && shareId) {
+      try {
+        const queueRef = ref(database, `queues/${shareId}`);
+        await set(queueRef, {
+          queue: state.queue,
+          players: state.players,
+          courts: state.courts,
+          lastUpdated: new Date().toISOString()
+        });
+        console.log("Firebase queue updated successfully");
+        return true;
+      } catch (error) {
+        console.error("Error updating shared queue:", error);
+        return false;
+      }
+    }
+    return false;
+  };
+
+  // Create a shareable link
+  const createShareableLink = async () => {
+    // Generate a short, unique ID
+    const newShareId = nanoid(6);
+    setShareId(newShareId);
+    
+    try {
+      // Save current queue state to Firebase
+      const queueRef = ref(database, `queues/${newShareId}`);
+      await set(queueRef, {
+        queue: state.queue,
+        players: state.players,
+        courts: state.courts,
+        createdAt: new Date().toISOString(),
+        lastUpdated: new Date().toISOString()
+      });
+      
+      // Setup auto-removal when disconnected (optional)
+      // onDisconnect(queueRef).remove();
+      
+      setIsSharing(true);
+      
+      // Store in localStorage
+      localStorage.setItem('queueShareId', newShareId);
+      localStorage.setItem('queueIsSharing', 'true');
+      
+      return `${typeof window !== 'undefined' ? window.location.origin : ''}/shared-queue/${newShareId}`;
+    } catch (error) {
+      console.error("Error creating shareable link:", error);
+      setShareId(null);
+      throw error;
+    }
+  };
+  
+  // Stop sharing the queue
+  const stopSharing = async () => {
+    if (!shareId) return;
+    
+    try {
+      // Remove the shared queue data from Firebase
+      const queueRef = ref(database, `queues/${shareId}`);
+      await remove(queueRef);
+      
+      setShareId(null);
+      setIsSharing(false);
+      
+      // Clear from localStorage
+      localStorage.removeItem('queueShareId');
+      localStorage.removeItem('queueIsSharing');
+    } catch (error) {
+      console.error("Error stopping sharing:", error);
+      throw error;
+    }
+  };
+
   // Player management
   const addNewPlayer = (name: string, skillLevel: Player['skillLevel']) => {
-    setState(currentState => addPlayer(currentState, name, skillLevel));
+    setState(currentState => {
+      const updatedState = addPlayer(currentState, name, skillLevel);
+      return updatedState;
+    });
+    
+    // If sharing, update Firebase
+    if (isSharing) {
+      setTimeout(() => {
+        updateFirebaseQueue();
+      }, 100);
+    }
   };
 
   // Check if a player is in any queue
   const isPlayerInQueue = (playerId: string): boolean => {
     return state.queue.some(item => item.playerIds.includes(playerId));
-  };
-
-  // Calculate court fee per player based on config
-  const calculateCourtFeePerPlayer = (playerCount: number, feeConfig: FeeConfig): number => {
-    if (!feeConfig.courtFeeType || !feeConfig.courtFeeAmount) return 0;
-    
-    if (feeConfig.courtFeeType === "perHead") {
-      return feeConfig.courtFeeAmount;
-    }
-    
-    if (feeConfig.courtFeeType === "perHour") {
-      const numCourts = feeConfig.numCourts || 1;
-      const rentalHours = feeConfig.rentalHours || 1;
-      const totalCourtFee = feeConfig.courtFeeAmount * numCourts * rentalHours;
-      return playerCount > 0 ? totalCourtFee / playerCount : 0;
-    }
-    
-    return 0;
   };
 
   // Court management
@@ -153,6 +301,13 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       };
     });
     
+    // If sharing, update Firebase
+    if (isSharing) {
+      setTimeout(() => {
+        updateFirebaseQueue();
+      }, 100);
+    }
+    
     return { success: true };
   };
 
@@ -188,13 +343,6 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
           : game
       );
       
-      // ===== FIXED: Calculate court fee per player =====
-      const playersInGame = court.players.length;
-      const courtFeePerPlayer = calculateCourtFeePerPlayer(
-        playersInGame, 
-        currentState.feeConfig
-      );
-      
       // Update players - increment games played and update fees if auto-calculate is on
       const updatedPlayers = currentState.players.map(player => {
         if (court.players.includes(player.id)) {
@@ -207,26 +355,22 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
           
           // Add fees if auto-calculate is enabled
           if (currentState.feeConfig.autoCalculate) {
-            // ===== FIXED: Include both match fee and court fee =====
-            const matchFee = gameSession.feePerPlayer;
-            const totalFeeAmount = matchFee + courtFeePerPlayer;
+            const feeAmount = gameSession.feePerPlayer;
             
-            // Add fee history record (including both fees)
+            // Add fee history record
             const feeHistoryItem = {
               gameId: gameSession.id,
               courtId,
               gameType: gameSession.gameType,
-              feeAmount: totalFeeAmount, // Include both fees
-              matchFee,                  // Original match fee 
-              courtFee: courtFeePerPlayer, // Court fee component
+              feeAmount,
               timestamp: currentTime,
               paid: false
             };
             
             playerUpdate = {
               ...playerUpdate,
-              totalFees: playerUpdate.totalFees + totalFeeAmount,
-              unpaidFees: playerUpdate.unpaidFees + totalFeeAmount,
+              totalFees: playerUpdate.totalFees + feeAmount,
+              unpaidFees: playerUpdate.unpaidFees + feeAmount,
               feeHistory: [...(playerUpdate.feeHistory || []), feeHistoryItem]
             };
           }
@@ -259,7 +403,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         startTime: gameSession.startTime,
         endTime: currentTime,
         durationMinutes,
-        feesCharged: gameSession.totalFees + (courtFeePerPlayer * court.players.length), // FIXED: Include court fees
+        feesCharged: gameSession.totalFees,
         // Cache player names for easier display/searching
         playerNames: court.players.map(id => {
           const player = currentState.players.find(p => p.id === id);
@@ -280,67 +424,88 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         matchHistory: [...currentMatchHistory, matchRecord] // Safely add to match history
       };
     });
+    
+    // If sharing, update Firebase after state update completes
+    if (isSharing) {
+      setTimeout(() => {
+        updateFirebaseQueue();
+      }, 100);
+    }
   };
 
- // Queue management - MODIFIED
-const addPlayerToQueue = (playerIds: string[], isDoubles: boolean) => {
-  // Create a new queue item directly
-  setState(currentState => {
-    const newQueueItem: QueueItem = {
-      id: generateId(),
-      playerIds,
-      requestedTime: new Date().toISOString(),
-      isDoubles
-    };
-    
-    // Update the inQueue property for the selected players
-    const updatedPlayers = currentState.players.map(player => 
-      playerIds.includes(player.id) 
-        ? { ...player, inQueue: true }
-        : player
-    );
-    
-    return {
-      ...currentState,
-      queue: [...currentState.queue, newQueueItem],
-      players: updatedPlayers  // Also update the player objects
-    };
-  });
-};
-
-// MODIFIED - update to also update player inQueue status
-const removePlayerFromQueue = (queueId: string) => {
-  setState(currentState => {
-    // Find the queue item to be removed
-    const queueItem = currentState.queue.find(item => item.id === queueId);
-    if (!queueItem) return currentState;
-    
-    // Get the player IDs from the queue item
-    const playerIdsToRemove = queueItem.playerIds;
-    
-    // Filter out the queue item
-    const updatedQueue = currentState.queue.filter(item => item.id !== queueId);
-    
-    // Update inQueue status for players who are no longer in any queue
-    const updatedPlayers = currentState.players.map(player => {
-      if (playerIdsToRemove.includes(player.id)) {
-        // Check if the player is still in any other queue
-        const stillInQueue = updatedQueue.some(item => item.playerIds.includes(player.id));
-        return {
-          ...player,
-          inQueue: stillInQueue
-        };
-      }
-      return player;
+  // Queue management - MODIFIED
+  const addPlayerToQueue = (playerIds: string[], isDoubles: boolean) => {
+    // Create a new queue item directly
+    setState(currentState => {
+      const newQueueItem: QueueItem = {
+        id: generateId(),
+        playerIds,
+        requestedTime: new Date().toISOString(),
+        isDoubles
+      };
+      
+      // Update the inQueue property for the selected players
+      const updatedPlayers = currentState.players.map(player => 
+        playerIds.includes(player.id) 
+          ? { ...player, inQueue: true }
+          : player
+      );
+      
+      return {
+        ...currentState,
+        queue: [...currentState.queue, newQueueItem],
+        players: updatedPlayers  // Also update the player objects
+      };
     });
     
-    return {
-      ...currentState,
-      queue: updatedQueue,
-      players: updatedPlayers
-    };
-  });
-};
+    // If sharing, update Firebase
+    if (isSharing) {
+      setTimeout(() => {
+        updateFirebaseQueue();
+      }, 100);
+    }
+  };
+
+  // MODIFIED - update to also update player inQueue status
+  const removePlayerFromQueue = (queueId: string) => {
+    setState(currentState => {
+      // Find the queue item to be removed
+      const queueItem = currentState.queue.find(item => item.id === queueId);
+      if (!queueItem) return currentState;
+      
+      // Get the player IDs from the queue item
+      const playerIdsToRemove = queueItem.playerIds;
+      
+      // Filter out the queue item
+      const updatedQueue = currentState.queue.filter(item => item.id !== queueId);
+      
+      // Update inQueue status for players who are no longer in any queue
+      const updatedPlayers = currentState.players.map(player => {
+        if (playerIdsToRemove.includes(player.id)) {
+          // Check if the player is still in any other queue
+          const stillInQueue = updatedQueue.some(item => item.playerIds.includes(player.id));
+          return {
+            ...player,
+            inQueue: stillInQueue
+          };
+        }
+        return player;
+      });
+      
+      return {
+        ...currentState,
+        queue: updatedQueue,
+        players: updatedPlayers
+      };
+    });
+    
+    // If sharing, update Firebase
+    if (isSharing) {
+      setTimeout(() => {
+        updateFirebaseQueue();
+      }, 100);
+    }
+  };
 
   const getNextMatch = (): QueueItem | null => {
     return suggestNextMatch(state);
@@ -429,7 +594,11 @@ const removePlayerFromQueue = (queueId: string) => {
     localStorage.removeItem('skipFeeWarning');
     localStorage.removeItem('hideQueueNotification');
     localStorage.removeItem('hideCourtNotification');
+    localStorage.removeItem('queueShareId');
+    localStorage.removeItem('queueIsSharing');
     setState(initialAppState);
+    setIsSharing(false);
+    setShareId(null);
   };
 
   // This is for marking a single player
@@ -491,6 +660,12 @@ const removePlayerFromQueue = (queueId: string) => {
     });
   };
 
+  // Method to set initial sharing state from anywhere in the app
+  const setInitialSharingState = (newShareId: string, newIsSharing: boolean) => {
+    setShareId(newShareId);
+    setIsSharing(newIsSharing);
+  };
+
   return (
     <DataContext.Provider
       value={{
@@ -507,7 +682,15 @@ const removePlayerFromQueue = (queueId: string) => {
         markFeesAsPaid,
         markPlayerAsDonePlaying,
         markPlayersAsDonePlaying,
-        isPlayerInQueue
+        isPlayerInQueue,
+        // Sharing functions
+        createShareableLink,
+        stopSharing,
+        isSharing,
+        shareId,
+        shareUrl,
+        updateFirebaseQueue,
+        setInitialSharingState
       }}
     >
       {children}

@@ -1,6 +1,7 @@
 "use client";
 
 import CourtDisplay from '@/components/courts/CourtDisplay';
+import ClientQueueDisplay from '@/components/queue/ClientQueueDisplay';
 import PlayerList from '@/components/players/PlayerList';
 import useModal from '@/hooks/useModal';
 import Modal from '@/components/ui/Modal';
@@ -28,7 +29,7 @@ const Home = () => {
   return (
     <div className="space-y-8 px-3 sm:px-4">
       <h1 className="text-[14px] sm:text-[18px] mt-2 mb-8 border-l-[3px] border-[#fffff] text-white leading-none pl-[0.55rem] sm:block hidden">Smart Badminton Queuing Management</h1>
-      
+      <div className='hidden'><ClientQueueDisplay /></div>
       <CourtDisplay />
       <PlayerList />
 

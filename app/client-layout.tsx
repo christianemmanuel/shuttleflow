@@ -7,6 +7,7 @@ import { ToastProvider } from '@/context/ToastContext';
 import { ToastContainer } from '@/components/ui/Toast';
 import PageLoader from '@/components/ui/PageLoader';
 import { useLoader } from '@/context/LoaderContext';
+import FirebaseSyncWrapper from '@/components/FirebaseSyncWrapper';
 
 function AppContent({ children }: { children: React.ReactNode }) {
   const { isLoading, hideLoader, message } = useLoader();
@@ -32,7 +33,9 @@ export default function ClientLayout({
     <ToastProvider>
       <LoaderProvider>
         <DataProvider>
-          <AppContent>{children}</AppContent>
+          <FirebaseSyncWrapper>
+            <AppContent>{children}</AppContent>
+          </FirebaseSyncWrapper>
         </DataProvider>
       </LoaderProvider>
     </ToastProvider>

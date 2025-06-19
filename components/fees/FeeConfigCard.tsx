@@ -86,7 +86,7 @@ export default function FeeConfigCard() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="singlesFee" className="block text-sm font-medium mb-1">
+              <label htmlFor="singlesFee" className="block text-xs text-gray-500 mb-1">
                 Singles Fee (per player)
               </label>
               <div className="relative">
@@ -108,7 +108,7 @@ export default function FeeConfigCard() {
             </div>
             
             <div>
-              <label htmlFor="doublesFee" className="block text-sm font-medium mb-1">
+              <label htmlFor="doublesFee" className="block text-xs text-gray-500 mb-1">
                 Doubles Fee (per player)
               </label>
               <div className="relative">
@@ -133,20 +133,6 @@ export default function FeeConfigCard() {
           <div className="pt-2">
             <label className="block text-sm font-medium mb-2">Court Fee</label>
             <div className="flex gap-3 mb-2">
-              <label className={`flex items-center p-1 cursor-pointer justify-center text-[14px] ${courtFeeType === 'perHour' && 'text-green-600' }`}>
-                {courtFeeType === 'perHour' ? <MdOutlineRadioButtonChecked size={`21px`} className='text-green-500'/> : <MdOutlineRadioButtonUnchecked size={`21px`} className='text-gray-400'/>}
-
-                <input
-                  type="radio"
-                  name="courtFeeType"
-                  value="perHour"
-                  checked={courtFeeType === "perHour"}
-                  onChange={() => setCourtFeeType("perHour")}
-                  className="hidden"
-                />
-                <span className='ml-[4px]'>Per hour</span>
-              </label>
-
               <label className={`flex items-center p-1 cursor-pointer justify-center text-[14px] ${courtFeeType === 'perHead' && 'text-green-600' }`}>
                 {courtFeeType === 'perHead' ? <MdOutlineRadioButtonChecked size={`21px`} className='text-green-500'/> : <MdOutlineRadioButtonUnchecked size={`21px`} className='text-gray-400'/>}
 
@@ -161,21 +147,32 @@ export default function FeeConfigCard() {
                 <span className='ml-[4px]'>Per head</span>
               </label>
 
+              <label className={`flex items-center p-1 cursor-pointer justify-center text-[14px] ${courtFeeType === 'perHour' && 'text-green-600' }`}>
+                {courtFeeType === 'perHour' ? <MdOutlineRadioButtonChecked size={`21px`} className='text-green-500'/> : <MdOutlineRadioButtonUnchecked size={`21px`} className='text-gray-400'/>}
+
+                <input
+                  type="radio"
+                  name="courtFeeType"
+                  value="perHour"
+                  checked={courtFeeType === "perHour"}
+                  onChange={() => setCourtFeeType("perHour")}
+                  className="hidden"
+                />
+                <span className='ml-[4px]'>Per hour</span>
+              </label>
             </div>
             <div className="flex gap-3 items-center mb-2 flex-col">
               <div className='w-full'>
-                <label htmlFor="courtFeeAmount" className='block pb-1'>{courtFeeType === "perHour" ? "Amount Per Hour" : "Amount Per Player"}</label>
+                <label htmlFor="courtFeeAmount" className='block text-xs text-gray-500 mb-1'>{courtFeeType === "perHour" ? "Court Rate per Hour" : "Court Rate per Player"}</label>
                 <div className="relative">
                   <span className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500'>{currency === "PHP" ? "₱" : "$"}</span>
                   <input
                     type="number"
                     id="courtFeeAmount"
-                    min="0"
-                    step="0.01"
                     value={courtFeeAmount}
                     onChange={e => setCourtFeeAmount(e.target.value)}
                     className="border rounded-md px-3 py-2 w-full pl-6.5"
-                    placeholder={`Enter ${courtFeeType === "perHour" ? "amount per hour" : "amount per player"}`}
+                    placeholder={`Enter ${courtFeeType === "perHour" ? "rate per hour" : "rate per player"}`}
                     required
                   />
                 </div>
@@ -183,7 +180,7 @@ export default function FeeConfigCard() {
               {courtFeeType === "perHour" && (
                 <div className="flex gap-2 w-full">
                   <div className='w-full'>
-                    <label htmlFor="numCourts" className='block pb-1'>Number of courts</label>
+                    <label htmlFor="numCourts" className='block text-xs text-gray-500 mb-1'>Number of courts</label>
                     <input
                       type="number"
                       id='numCourts'
@@ -197,7 +194,7 @@ export default function FeeConfigCard() {
                   </div>
 
                   <div className='w-full'>
-                    <label htmlFor="rentalHours" className='block pb-1'>Rental hours</label>
+                    <label htmlFor="rentalHours" className='block text-xs text-gray-500 mb-1'>Rental hours</label>
                     <div className="relative">
                       <LuClock3 className='absolute left-2 text-[16px] top-[11.5px] items-center pointer-events-none text-gray-500'/>
                       <input
@@ -224,21 +221,28 @@ export default function FeeConfigCard() {
             </p>
           </div>
 
-          <div>
-            <label htmlFor="currency" className="block text-sm font-medium mb-1">
-              Currency
-            </label>
-            <select
-              id="currency"
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value)}
-              className="w-full border rounded-md px-3 py-2"
-            >
-              <option value="USD">USD ($)</option>
-              <option value="PHP">PHP (₱)</option>
-              <option value="EUR">EUR (€)</option>
-              <option value="GBP">GBP (£)</option>
-            </select>
+          <div className='p-4 bg-gray-100 rounded-md'>
+            <div className='w-full'>
+              <label htmlFor='currency' className="block text-xs text-gray-500 mb-1">Select Currency</label>
+              <div className="relative">
+                <select
+                  id="currency"
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value)}
+                  className="w-full appearance-none border rounded-md px-2 py-2 pl-3 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 h-[38px]"
+                >
+                  <option value="USD">USD ($)</option>
+                  <option value="PHP">PHP (₱)</option>
+                  <option value="EUR">EUR (€)</option>
+                  <option value="GBP">GBP (£)</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 text-gray-700">
+                  <svg className="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
           </div>
           
           <div className="flex space-x-3">
