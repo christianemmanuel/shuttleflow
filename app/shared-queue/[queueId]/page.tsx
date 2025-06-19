@@ -93,9 +93,12 @@ export default function SharedQueueView() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <>
+      <div className="flex justify-center flex-col text-white gap-4 items-center min-h-screen">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-white"></div>
+        <p>Connecting...</p>
       </div>
+      </>
     );
   }
 
@@ -140,7 +143,7 @@ export default function SharedQueueView() {
       
       <div className="bg-white p-4 rounded-lg shadow-md mb-5">
         {lastUpdate && (
-          <div className={`text-[13px] mb-2.5 bg-green-100 text-green-700 px-2 py-1 ${refreshing ? 'bg-red-200 text-red-400 px-2 py-1 rounded animate-pulse' : ''}`}>
+          <div className={`text-[13px] mb-2.5 bg-green-100 text-green-700 px-2 py-1 ${refreshing ? 'bg-blue-200 text-blue-400 px-2 py-1 rounded animate-pulse' : ''}`}>
             Last updated: {lastUpdate}
           </div>
         )}
@@ -171,7 +174,7 @@ export default function SharedQueueView() {
                   <div>
                     {/* Player display */}
                     {court.players && court.players.length > 0 && (
-                      <div className="bg-white rounded-md p-2 border border-green-200">
+                      <div className="bg-white rounded-md p-2 border border-gray-200">
                         {court.isDoubles && court.players.length === 4 ? (
                           <div className="flex items-center justify-between text-sm">
                             <div className="text-blue-800 font-medium">
@@ -225,7 +228,7 @@ export default function SharedQueueView() {
           </button>
           </h2>
           {queueData.queue.length === 0 ? (
-            <div className="text-center py-8 bg-gray-50 rounded-lg">
+            <div className="text-center py-8 bg-gray-100 rounded-lg p-3">
               <GiShuttlecock size="3em" className="text-gray-600 mx-auto" />
               <h3 className="mt-2 text-sm font-medium text-gray-900">No players in queue</h3>
               <p className="mt-1 text-sm text-gray-500">Please wait for the queue master to add players.</p>

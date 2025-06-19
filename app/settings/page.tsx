@@ -6,6 +6,8 @@ import { useData } from '@/context/DataContext';
 import { useLoader } from '@/context/LoaderContext';
 import Modal from '@/components/ui/Modal';
 import useModal from '@/hooks/useModal';
+import { ref, remove } from 'firebase/database';
+import { database } from '@/lib/firebase';
 
 const Settings = () => {
   const resetAllModal = useModal();
@@ -13,19 +15,48 @@ const Settings = () => {
   const { resetAll } = useData();
   const [isResetting, setIsResetting] = useState(false);
 
+  const [shareId, setShareId] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('queueShareId');
+    }
+    return null;
+  });
+    
+  const [isSharing, setIsSharing] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('queueIsSharing') === 'true';
+    }
+    return false;
+  });
+
   // Handle reset all data
-  const handleResetAll = () => {
-    setIsResetting(true);
-    
-    // Show the full-screen loader
-    showLoader("Resetting all data...");
-    
-    // Add a slight delay to show the loading state
-    setTimeout(() => {
-      resetAll();
-      setIsResetting(false);
-      resetAllModal.closeModal();
-    }, 800);
+  const handleResetAll = async () => {
+    console.log(isSharing);
+    try {
+      await setIsResetting(true);
+      // Show the full-screen loader
+      showLoader("Resetting all data...");
+
+      // Remove the shared queue data from Firebase
+      const queueRef = ref(database, `queues/${shareId}`);
+      await remove(queueRef);
+      
+      setShareId(null);
+      setIsSharing(false);
+      
+      // Clear from localStorage
+      localStorage.removeItem('queueShareId');
+      localStorage.removeItem('queueIsSharing');
+
+    } catch (error) {
+      console.error("Error stopping sharing:", error);
+    } finally {
+      setTimeout(async()  => {
+        resetAll();
+        setIsResetting(false);
+        resetAllModal.closeModal();
+      }, 800);
+    }
   };
 
   return (
