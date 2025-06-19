@@ -104,9 +104,15 @@ export default function SharedQueueView() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex flex-col gap-5 items-center justify-center px-4">
+        <button 
+          onClick={handleClick}
+          className="flex items-center gap-[0.15rem] text-white font-semibold text-[18px] cursor-pointer hover:opacity-80 transition-opacity"
+        >
+          ShuttleFlow <GiShuttlecock className="rotate-[205deg]" />
+        </button>
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md">
-          <h2 className="text-xl font-bold text-red-800 mb-2">Error</h2>
+          <h2 className="text-xl font-bold text-red-800 mb-2">Error 404</h2>
           <p className="text-red-600">{error}</p>
           <p className="mt-4 text-sm text-gray-600">
             This queue may no longer be available or has been stopped by the creator.
@@ -254,12 +260,12 @@ export default function SharedQueueView() {
                     <div className="flex items-center justify-center mt-2 mb-2">
                       <div className="text-center sm:px-3 sm:py-2 py-2 px-2.5 bg-white rounded-md border border-gray-300 w-full">
                         <div className="flex items-center justify-between capitalize sm:flex-row flex-row sm:gap-0.5 gap-2.5">
-                          <div className="text-sm font-medium text-blue-800 text-left">
+                          <div className="text-sm font-medium capitalize text-blue-800 text-left">
                             <span className='block'>{queueData.players.find((p: Player) => p.id === item.playerIds[0])?.name}</span>
                             <span className='block mt-1'>{queueData.players.find((p: Player) => p.id === item.playerIds[1])?.name}</span>
                           </div>
                           <div className="text-xs px-2 py-1 bg-gray-200 text-[9px] rounded-full font-bold uppercase">vs</div>
-                          <div className="text-sm font-medium text-green-800 text-left">
+                          <div className="text-sm font-medium capitalize text-green-800 text-left">
                             <span className='block'>{queueData.players.find((p: Player) => p.id === item.playerIds[2])?.name}</span>
                             <span className='block mt-1'>{queueData.players.find((p: Player) => p.id === item.playerIds[3])?.name}</span>
                           </div>
@@ -270,11 +276,11 @@ export default function SharedQueueView() {
                     <div className="flex items-center justify-center mt-2 mb-2">
                       <div className="text-center sm:px-3 sm:py-2 py-3 px-2.5 bg-white rounded-md border border-gray-300 w-full">
                         <div className="flex items-center justify-between capitalize sm:flex-row flex-row">
-                          <div className="text-sm font-medium text-blue-800">
+                          <div className="text-sm font-medium capitalize text-blue-800">
                             {queueData.players.find((p: Player) => p.id === item.playerIds[0])?.name}
                           </div>
                           <div className="text-xs px-2 py-1 bg-gray-200 text-[9px] rounded-full font-bold uppercase">vs</div>
-                          <div className="text-sm font-medium text-green-800">
+                          <div className="text-sm font-medium capitalize text-green-800">
                             {queueData.players.find((p: Player) => p.id === item.playerIds[1])?.name}
                           </div>
                         </div>
