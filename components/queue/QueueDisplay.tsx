@@ -403,13 +403,13 @@ export default function QueueDisplay() {
       await navigator.clipboard.writeText(shareUrl);
       showToast('Link copied to clipboard!', 'success');
     } catch (error) {
-      showToast('Failed to copy link', 'error');
+      showToast(error instanceof Error ? error.message : 'Failed to copy link', 'error');
     }
   };
   
   // Show QR code modal
   const handleShowQRCode = () => {
-    setShowQRCode(true);
+    setShowQRCode(!showQRCode);
     qrModal.openModal();
   };
   

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useData } from '@/context/DataContext';
 import { formatCurrency } from '@/lib/utils';
 import { BiExport } from "react-icons/bi";
@@ -50,9 +50,6 @@ export default function FeeManagement() {
   const handleMarkAsPaid = (playerId: string) => {
     const player = players.find(p => p.id === playerId);
     if (!player) return;
-
-    // Include court fee in the paid amount
-    const paidAmount = player.unpaidFees + (player.gamesPlayed > 0 ? courtFeePerPlayer : 0);
     
     // Mark the base fees as paid through the context
     markFeesAsPaid(playerId, player.unpaidFees);
