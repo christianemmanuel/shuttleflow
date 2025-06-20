@@ -475,7 +475,7 @@ export default function QueueDisplay() {
               }`}
             >
               <FaLink size={14} />
-              <span>{isCreatingLink ? 'Creating...' : 'Create Link'}</span>
+              <span>{isCreatingLink ? 'Creating...' : 'Create Share Link'}</span>
             </button>
           ) : (
             <button
@@ -488,6 +488,14 @@ export default function QueueDisplay() {
           )}
         </div>
       </div>
+
+      {!isSharing && (
+        <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+          <p className="text-sm font-medium text-blue-800">
+            Share your queue with players so they can view upcoming matches.
+          </p>
+        </div>
+      )}
       
       {/* Share URL Display */}
       {isSharing && shareUrl && (

@@ -90,7 +90,7 @@ export function ToastContainer() {
   const { toasts } = useToast();
 
   return (
-    <div className="fixed bottom-5 right-3 z-100 min-w-60 max-w-[calc(100vw-2rem)]">
+    <div className="fixed top-18 right-3 z-100 min-w-60 max-w-[calc(100vw-2rem)]">
       {toasts.map((toast) => (
         <Toast key={toast.id} toast={toast} />
       ))}
