@@ -273,8 +273,6 @@ export default function SharedQueueView() {
                           </div>
                         </div>
                       </div>
-
-                      <div>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Officia eum reiciendis maiores repellat excepturi a vitae odio libero, hic, quasi ad obcaecati, sit tempora cupiditate. Sed, aut a! Ratione, deserunt?</div>
                     </>
                   ) : !item.isDoubles && item.playerIds && item.playerIds.length === 2 ? (
                     <div className="flex items-center justify-center mt-2 mb-2">
