@@ -8,7 +8,7 @@ import { GiShuttlecock } from "react-icons/gi";
 
 export default function MatchHistory() {
   const { state } = useData();
-  const { matchHistory, players, feeConfig } = state;
+  const { matchHistory, players, feeConfig, courts } = state;
   
   // State for filters and sorting
   const [searchQuery, setSearchQuery] = useState('');
@@ -224,7 +224,7 @@ export default function MatchHistory() {
                   
                   <div className="bg-blue-50 rounded-md border border-blue-100 p-2">
                     <div className="text-gray-500">Court</div>
-                    <div className="font-medium">Court #{match.courtId}</div>
+                    <div className="font-medium">{courts.find(c => c.id === match.courtId)?.name || `Court ${match.courtId}`}</div>
                   </div>
       
                   <div className="bg-blue-50 rounded-md border border-blue-100 p-2 hidden">

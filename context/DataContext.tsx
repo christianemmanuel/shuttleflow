@@ -41,6 +41,7 @@ interface DataContextType {
   shareUrl: string | null;
   updateFirebaseQueue: () => Promise<boolean>;
   setInitialSharingState: (shareId: string, isSharing: boolean) => void;
+  renameCourt: (courtId: number, newName: string) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -666,6 +667,35 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     setIsSharing(newIsSharing);
   };
 
+  const renameCourt = (courtId: number, newName: string) => {
+     setState(currentState => {
+      const updatedCourts = currentState.courts.map(court => 
+        court.id === courtId ? { ...court, name: newName } : court
+      );
+      
+      const updatedState = {
+        ...currentState,
+        courts: updatedCourts
+      };
+      
+      // Save to localStorage
+      saveAppState(updatedState);
+      
+      // If sharing is enabled, update Firebase
+      if (isSharing && shareId) {
+        const queueRef = ref(database, `queues/${shareId}`);
+        set(queueRef, {
+          queue: updatedState.queue,
+          players: updatedState.players,
+          courts: updatedState.courts,
+          lastUpdated: new Date().toISOString()
+        }).catch(error => console.error("Error updating court name in Firebase:", error));
+      }
+      
+      return updatedState;
+    });
+  };
+
   return (
     <DataContext.Provider
       value={{
@@ -690,7 +720,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         shareId,
         shareUrl,
         updateFirebaseQueue,
-        setInitialSharingState
+        setInitialSharingState,
+        renameCourt
       }}
     >
       {children}

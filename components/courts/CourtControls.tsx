@@ -63,7 +63,7 @@ export default function CourtControls() {
               <option value="">Select a court</option>
               {availableCourts.map(court => (
                 <option key={court.id} value={court.id}>
-                  Court {court.id}
+                  {court.name || `Court ${court.id}`}
                 </option>
               ))}
             </select>

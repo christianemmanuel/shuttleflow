@@ -26,6 +26,7 @@ export type FeeHistoryItem = {
 // Court Data Type
 export type Court = {
   id: number;
+  name: string;
   status: "available" | "occupied";
   players: string[];
   startTime: string | null;

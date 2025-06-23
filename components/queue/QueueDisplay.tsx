@@ -161,13 +161,13 @@ const QueueItem = ({
           </label>
           <div className="flex flex-wrap gap-2">
             {availableCourts.map(court => (
-              <button
-                key={court.id}
-                onClick={() => handleAssignToCourt(court.id)}
-                className="bg-blue-500 hover:bg-blue-600 border-b-[4px] border-b-blue-700 text-white py-1.5 px-3 rounded sm:text-sm text-[13px] cursor-pointer transition"
-              >
-                Court {court.id}
-              </button>
+             <button
+              key={court.id}
+              onClick={() => handleAssignToCourt(court.id)}
+              className="bg-blue-500 hover:bg-blue-600 border-b-[4px] border-b-blue-700 text-white py-1.5 px-3 rounded sm:text-sm text-[13px] cursor-pointer transition"
+            >
+              {court.name || `Court ${court.id}`}
+            </button>
             ))}
           </div>
         </div>
@@ -442,7 +442,7 @@ export default function QueueDisplay() {
       
       if (result.success) {
         removePlayerFromQueue(queueId);
-        showToast(`Match assigned to Court ${courtId}`, 'success', 2500);
+        showToast(`Match assigned to ${courts.find(c => c.id === courtId)?.name || `Court ${courtId}`}`, 'success', 2500);
       }
       // Error case is handled in the QueueItem component with the warning modal
     } else {
@@ -454,9 +454,9 @@ export default function QueueDisplay() {
     <div className="bg-white p-4 rounded-lg shadow-md mb-5">
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center">
-          <h2 className="text-lg font-bold mr-3">Queue</h2>
+          <h2 className="text-lg font-bold mr-2">Queue</h2>
           {queue.length > 0 && (
-            <span className="text-sm text-gray-500">
+            <span className="text-[12px] text-gray-500">
               {queue.length} {queue.length === 1 ? 'match' : 'matches'} waiting
             </span>
           )}
@@ -467,11 +467,11 @@ export default function QueueDisplay() {
           {!isSharing ? (
             <button
               onClick={handleCreateLink}
-              disabled={isCreatingLink || queue.length === 0}
-              className={`flex items-center space-x-1 px-3 py-1.5 rounded text-sm ${
+              // disabled={isCreatingLink || queue.length === 0}
+              className={`flex items-center space-x-1 px-0 py-1.5 rounded text-sm text-blue-500 ${
                 queue.length === 0 
-                  ? 'bg-gray-300 cursor-not-allowed text-gray-500' 
-                  : 'bg-blue-500 hover:bg-blue-600 text-white'
+                  ? '' 
+                  : ''
               }`}
             >
               <FaLink size={14} />
@@ -490,8 +490,9 @@ export default function QueueDisplay() {
       </div>
 
       {!isSharing && (
-        <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-          <p className="text-sm font-medium text-blue-800">
+        <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200 relative">
+          <div className="absolute top-[-5px] right-[15%] -translate-y-1/2 w-0 h-0 border-y-9 -rotate-90 border-y-transparent border-l-9 border-l-blue-200"></div>
+          <p className="text-sm font-medium text-blue-500">
             Share your queue with players so they can view upcoming matches.
           </p>
         </div>

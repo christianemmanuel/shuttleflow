@@ -5,7 +5,9 @@ import Link from 'next/link';
 import { Court, Player } from '@/types';
 import { formatTime } from '@/lib/utils';
 import { useToast } from '@/context/ToastContext';
+import { useData } from '@/context/DataContext';
 import { IoPersonAddSharp } from "react-icons/io5";
+import { HiOutlinePencilAlt } from "react-icons/hi";
 
 interface CourtCardProps {
   court: Court;
@@ -16,8 +18,10 @@ interface CourtCardProps {
 export default function CourtCard({ court, players, onComplete }: CourtCardProps) {
   const [showDetails, setshowDetails] = useState(false);
   const [isCompleteMatch, setisCompleteMatch] = useState(false);
+  const [isRenaming, setIsRenaming] = useState(false);
 
   const { showToast } = useToast();
+  const { renameCourt } = useData(); // Get the renameCourt function
 
   const handleCompleteMatch = async () => {
     setisCompleteMatch(true);
@@ -115,17 +119,42 @@ export default function CourtCard({ court, players, onComplete }: CourtCardProps
   const formatTimeValue = (value: number): string => {
     return value < 10 ? `0${value}` : `${value}`;
   };
+
+  // Updated rename court function that uses the context
+  const handleRenameCourt = () => {
+    setIsRenaming(true);
+    // Use the current name as default value in prompt
+    const newCourtName = prompt('Enter new court name:', court.name || `Court ${court.id}`);
+    
+    if (newCourtName && newCourtName.trim() !== '') {
+      // Call the context function to update the name in state
+      renameCourt(court.id, newCourtName.trim());
+      showToast(`Court renamed to: ${newCourtName.trim()}`, 'success', 3000);
+    }
+    setIsRenaming(false);
+  };
   
   return (
     <div className={`relative z-1 sm:p-4 p-3 h-full flex flex-col rounded-lg bg-[rgba(0,0,0,0.54)] min-h-[195px] sm:min-h-[232px] border border-[#3d3131]
       ${court.status === 'available' ? 'bg-[#262626]' : 'bg-amber-50'}`}>
       <div className="flex justify-between items-start mb-2">
-        <h3 className={`text-[15px] font-bold ${court.status === 'available' ? 'text-white' : 'text-[#262626]'}`}>Court #{court.id}</h3>
+        <h3 className={`text-[15px] font-bold flex items-center gap-1
+          ${court.status === 'available' ? 'text-white' : 'text-[#262626]'}`}>
+          {court.name || `Court #${court.id}`}
+          <button 
+            className={`ml-1 hover:text-blue-500 ${isRenaming ? 'opacity-50' : ''}`} 
+            onClick={handleRenameCourt}
+            disabled={isRenaming}
+          >
+            <HiOutlinePencilAlt className="w-4 h-4" />
+          </button>
+        </h3>
         <span className={`px-2 py-1 rounded-[50px] text-[10px] border ${court.status === 'available' ? 'text-[#04c951] border-[#04c951] bg-[#210606]' : 'text-[#fd9a01] border-[#fd9a01]'}`}>
           {court.status.toUpperCase()}
         </span>
       </div>
       
+      {/* Rest of your component stays the same */}
       {court.status === 'occupied' && (
         <>
           <div className="mb-2">

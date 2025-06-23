@@ -18,6 +18,7 @@ interface Player {
 
 interface Court {
   id: string;
+  name: string;
   status: 'occupied' | 'available';
   isDoubles: boolean;
   startTime?: string;
@@ -169,7 +170,7 @@ export default function SharedQueueView() {
                 }`}
               >
                 <h3 className="font-bold flex justify-between items-center mb-2.5">
-                  Court #{court.id}
+                  {court.name || `Court ${court.id}`}
                   {court.status === 'occupied' && (
                     <>
                       <span className="font-normal ml-2 text-gray-600">Started: {court.startTime && formatTime(court.startTime)}</span> 
