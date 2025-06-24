@@ -35,7 +35,7 @@ const Queue = () => {
   };
   
   return (
-    <div className='space-y-8 px-3 sm:px-4'>
+    <div className='space-y-8 px-3 sm:px-4 max-w-[768px] m-auto'>
       
       {/* Custom Tab Menu - Updated with third tab */}
       <div className="flex border-b bg-white p-1 h-[45px] rounded-md justify-between items-center mb-0">
