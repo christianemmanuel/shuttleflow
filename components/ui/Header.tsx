@@ -83,7 +83,7 @@ export default function Header() {
         </div>
       </header>
 
-      <header className="bg-[#ffffff] text-white py-2.5 px-4 md:hidden block fixed bottom-0 left-0 right-0 z-9 shadow-[inset_0_4px_6px_-1px_rgba(0,0,0,0.1)]">
+      <header className="bg-[#ffffff] text-white py-2.5 px-4 md:hidden block fixed bottom-0 left-0 right-0 z-9 shadow-[0px_-5px_15px_0px_rgba(0,0,0,0.1)]">
         <div className="mx-auto flex flex-col sm:flex-row justify-between items-center">
           <nav className="flex items-center space-x-3 justify-around w-full">
             <Link 

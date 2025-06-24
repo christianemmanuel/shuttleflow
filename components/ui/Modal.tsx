@@ -8,7 +8,7 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
   showCloseButton?: boolean;
   closeOnOverlayClick?: boolean;

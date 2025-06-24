@@ -170,16 +170,16 @@ export default function PlayerList() {
           <table className="min-w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-2 pl-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Name
                 </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Skill Level
                 </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Games Played
                 </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-2 py-2 pr-0 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
               </tr>
@@ -187,20 +187,20 @@ export default function PlayerList() {
             <tbody className="bg-white divide-y divide-gray-200 capitalize">
               {sortedPlayers.map(player => (
                 <tr key={player.id} className={`hover:bg-gray-100`}>
-                  <td className={`px-4 py-2 whitespace-nowrap ${player.donePlaying && 'opacity-50'}`}>
+                  <td className={`px-4 py-2 pl-1 whitespace-nowrap ${player.donePlaying && 'opacity-50'}`}>
                     {player.name}
                   </td>
-                  <td className={`px-4 py-2 whitespace-nowrap ${player.donePlaying && 'opacity-50'}`}>
+                  <td className={`px-3 py-2 whitespace-nowrap ${player.donePlaying && 'opacity-50'}`}>
                     <span className={`inline-block w-3 h-3 rounded-full mr-2 ${
                       player.skillLevel === 'beginner' ? 'bg-green-500' :
                       player.skillLevel === 'intermediate' ? 'bg-yellow-500' : 'bg-red-500'
                     }`}></span>
                     {player.skillLevel.charAt(0).toUpperCase() + player.skillLevel.slice(1)}
                   </td>
-                  <td className={`px-4 py-2 whitespace-nowrap ${player.donePlaying && 'opacity-50'}`}>
+                  <td className={`px-2 py-2 whitespace-nowrap text-center ${player.donePlaying && 'opacity-50'}`}>
                     {player.gamesPlayed}
                   </td>
-                  <td className={`px-4 py-2 whitespace-nowrap`}>
+                  <td className={`px-2 py-2 pr-0 whitespace-nowrap`}>
                     <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(player)}`}>
                       {getStatusLabel(player)}
                     </span>

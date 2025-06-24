@@ -151,7 +151,7 @@ export default function AddToQueueForm() {
     <>
       <AddPlayerForm />
 
-      <div className="bg-white p-4 pt-5 rounded-lg shadow-md mb-5">
+      <div className="bg-white p-[.85rem] pt-5 rounded-lg shadow-md mb-5">
         <form onSubmit={handleSubmit}>
           {availablePlayers.length >= 1 && (
             <>

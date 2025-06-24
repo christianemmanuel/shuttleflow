@@ -65,7 +65,7 @@ export default function AddPlayerForm({ inModal = false, onPlayerAdded }: Player
   };
   
   return (
-    <div className={`${inModal ? '' : 'bg-white p-4 rounded-lg shadow-md mb-4.5'}`}>
+    <div className={`${inModal ? '' : 'bg-white p-[.85rem] rounded-lg shadow-md mb-4.5'}`}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className='mb-3'>
           <label className="font-sm mb-2 block text-gray-700">
