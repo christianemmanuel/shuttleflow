@@ -29,7 +29,7 @@ export default function CourtCard({ court, players, onComplete }: CourtCardProps
   const deleteModal = useModal();
 
   const { showToast } = useToast();
-  const { renameCourt, removeCourt } = useData(); // Get the renameCourt function
+  const { renameCourt, removeCourt, syncToFirebase } = useData(); // Get the renameCourt function
 
   const handleCompleteMatch = async () => {
     setisCompleteMatch(true);
@@ -37,7 +37,16 @@ export default function CourtCard({ court, players, onComplete }: CourtCardProps
     await new Promise(resolve => setTimeout(resolve, 800));
 
     try {
+      // Call the completeMatch function
       await onComplete();
+      
+      // Give React time to process the state update
+      setTimeout(() => {
+        // If there's a syncToFirebase function available, call it as an extra safety measure
+        if (typeof syncToFirebase === 'function') {
+          syncToFirebase();
+        }
+      }, 100);
     } catch (error) {
       console.error('Error completing match:', error);
     } finally {
@@ -45,8 +54,8 @@ export default function CourtCard({ court, players, onComplete }: CourtCardProps
       showToast('Well Played!', 'success', 3000);
     }
 
-    setshowDetails(false)
-  }
+    setshowDetails(false);
+  };
 
   // Important: Preserve the exact order of players as in court.players array
   const currentPlayers = court.players.map(playerId => 

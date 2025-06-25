@@ -172,7 +172,7 @@ const QueueItem = ({
             {
               availableCourts.length === 0 && (
                 <span className="text-sm text-gray-500">
-                  No courts available please add a court first
+                  No courts available at the moment.
                 </span>
               )
             }
