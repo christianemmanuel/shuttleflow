@@ -261,7 +261,7 @@ const QueueItem = ({
 
 // Main QueueDisplay component
 export default function QueueDisplay() {
-  const { state, removePlayerFromQueue, assignToCourt } = useData();
+  const { state, removePlayerFromQueue, assignToCourt, syncToFirebase } = useData();
   const { queue, courts } = state;
   const { showToast } = useToast();
   
@@ -371,6 +371,13 @@ export default function QueueDisplay() {
       localStorage.setItem('queueIsSharing', 'true');
       
       showToast('Queue link created!', 'success');
+
+      setTimeout(() => {
+        // If there's a syncToFirebase function available, call it as an extra safety measure
+        if (typeof syncToFirebase === 'function') {
+          syncToFirebase();
+        }
+      }, 100);
     } catch (error) {
       console.error("Error creating shareable link:", error);
       showToast('Failed to create share link', 'error');
