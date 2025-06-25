@@ -8,6 +8,7 @@ import { ToastContainer } from '@/components/ui/Toast';
 import PageLoader from '@/components/ui/PageLoader';
 import { useLoader } from '@/context/LoaderContext';
 import FirebaseSyncWrapper from '@/components/FirebaseSyncWrapper';
+import Script from 'next/script';
 
 function AppContent({ children }: { children: React.ReactNode }) {
   const { isLoading, hideLoader, message } = useLoader();
@@ -30,14 +31,35 @@ export default function ClientLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ToastProvider>
-      <LoaderProvider>
-        <DataProvider>
-          <FirebaseSyncWrapper>
-            <AppContent>{children}</AppContent>
-          </FirebaseSyncWrapper>
-        </DataProvider>
-      </LoaderProvider>
-    </ToastProvider>
+    <>
+      {/* Global Site Tag (gtag.js) - Google Analytics */}
+      <Script
+        strategy="afterInteractive"
+        src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
+      />
+      <Script
+        id="gtag-init"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}', {
+              page_path: window.location.pathname,
+            });
+          `,
+        }}
+      />
+      <ToastProvider>
+        <LoaderProvider>
+          <DataProvider>
+            <FirebaseSyncWrapper>
+              <AppContent>{children}</AppContent>
+            </FirebaseSyncWrapper>
+          </DataProvider>
+        </LoaderProvider>
+      </ToastProvider>
+    </>
   );
 }
