@@ -57,7 +57,7 @@ export default function FirebaseSyncWrapper({ children }: { children: React.Reac
   }, [syncInitialized, setInitialSharingState, state]);
   
   // Simple debounce function without using lodash
-  const debouncedUpdate = (fn: Function, delay: number) => {
+  const debouncedUpdate = (fn: () => void, delay: number) => {
     // Clear any existing timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
