@@ -42,6 +42,9 @@ interface DataContextType {
   updateFirebaseQueue: () => Promise<boolean>;
   setInitialSharingState: (shareId: string, isSharing: boolean) => void;
   renameCourt: (courtId: number, newName: string) => void;
+  addCourt: () => void;
+  removeCourt: (courtId: number) => void;
+  syncToFirebase: () => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -696,6 +699,109 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const syncToFirebase = () => {
+    if (isSharing && shareId) {
+      const queueRef = ref(database, `queues/${shareId}`);
+      set(queueRef, {
+        queue: state.queue,
+        players: state.players,
+        courts: state.courts,
+        lastUpdated: new Date().toISOString()
+      }).catch(error => {
+        console.error("Error syncing to Firebase:", error);
+      });
+    }
+  };
+
+  const addCourt = () => {
+    setState(currentState => {
+      // Limit to maximum 12 courts
+      if (currentState.courts.length >= 20) {
+        return currentState;
+      }
+
+      // Find the highest court ID
+      const highestId = Math.max(...currentState.courts.map(court => court.id), 0);
+      
+      // Create a new court with the next ID
+      const newCourt: Court = {
+        id: highestId + 1,
+        name: `Court ${highestId + 1}`,
+        status: 'available',
+        players: [],
+        startTime: null,
+        isDoubles: false,
+        currentGameId: null,
+        feeRate: 50.00
+      };
+      
+      const updatedCourts = [...currentState.courts, newCourt];
+      const updatedState = {
+        ...currentState,
+        courts: updatedCourts
+      };
+      
+      // Save to localStorage
+      saveAppState(updatedState);
+      
+      // Sync to Firebase if sharing is enabled
+      if (isSharing && shareId) {
+        const queueRef = ref(database, `queues/${shareId}`);
+        set(queueRef, {
+          queue: updatedState.queue,
+          players: updatedState.players,
+          courts: updatedState.courts,
+          lastUpdated: new Date().toISOString()
+        }).catch(error => {
+          console.error("Error updating courts in Firebase:", error);
+        });
+      }
+      
+      
+      return updatedState;
+    });
+  };
+
+  useEffect(() => {
+    if (isSharing && shareId) {
+      syncToFirebase();
+    }
+  }, [isSharing, shareId, state.courts, state.queue, state.players]);
+
+  const removeCourt = (courtId: number) => {
+    setState(currentState => {
+      // Check if the court is occupied
+      const courtToRemove = currentState.courts.find(court => court.id === courtId);
+      if (courtToRemove?.status === 'occupied') {
+        // Don't allow removing occupied courts
+        return currentState;
+      }
+      
+      const updatedCourts = currentState.courts.filter(court => court.id !== courtId);
+      
+      // If sharing is enabled, update Firebase
+      if (isSharing && shareId) {
+        const queueRef = ref(database, `queues/${shareId}`);
+        set(queueRef, {
+          ...currentState,
+          courts: updatedCourts,
+          lastUpdated: new Date().toISOString()
+        }).catch(error => console.error("Error updating courts in Firebase:", error));
+      }
+      
+      // Save to localStorage
+      saveAppState({
+        ...currentState,
+        courts: updatedCourts
+      });
+      
+      return {
+        ...currentState,
+        courts: updatedCourts
+      };
+    });
+  };
+
   return (
     <DataContext.Provider
       value={{
@@ -721,7 +827,10 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         shareUrl,
         updateFirebaseQueue,
         setInitialSharingState,
-        renameCourt
+        renameCourt,
+        addCourt,
+        removeCourt,
+        syncToFirebase
       }}
     >
       {children}

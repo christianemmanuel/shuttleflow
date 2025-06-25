@@ -135,7 +135,7 @@ const Settings = () => {
             <button
               type="button"
               onClick={resetAllModal.closeModal}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded cursor-pointer"
             >
               Cancel
             </button>
@@ -143,7 +143,7 @@ const Settings = () => {
               type="button"
               onClick={handleResetAll}
               disabled={isResetting}
-              className="px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded flex items-center"
+              className="px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded cursor-pointer flex items-center"
             >
               {isResetting ? (
                 <>

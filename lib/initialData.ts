@@ -1,7 +1,7 @@
 import { AppState, Court, FeeConfig } from '@/types';
 
 // Initialize courts (6 courts)
-export const initialCourts: Court[] = Array.from({ length: 6 }, (_, i) => ({
+export const initialCourts: Court[] = Array.from({ length: 3 }, (_, i) => ({
   id: i + 1,
   name: `Court ${i + 1}`,  // Add default name
   status: 'available',
@@ -9,7 +9,7 @@ export const initialCourts: Court[] = Array.from({ length: 6 }, (_, i) => ({
   startTime: null,
   isDoubles: false,
   currentGameId: null,
-  feeRate: 50.00
+  feeRate: 0.00
 }));
 
 // Initial fee configuration

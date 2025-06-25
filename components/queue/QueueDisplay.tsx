@@ -169,6 +169,13 @@ const QueueItem = ({
               {court.name || `Court ${court.id}`}
             </button>
             ))}
+            {
+              availableCourts.length === 0 && (
+                <span className="text-sm text-gray-500">
+                  No courts available please add a court first
+                </span>
+              )
+            }
           </div>
         </div>
 

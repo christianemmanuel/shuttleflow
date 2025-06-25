@@ -8,7 +8,9 @@ import { useToast } from '@/context/ToastContext';
 import { useData } from '@/context/DataContext';
 
 import { IoPersonAddSharp } from "react-icons/io5";
-import { HiOutlinePencilAlt } from "react-icons/hi";
+import { FiEdit } from "react-icons/fi";
+import { BsTrash3 } from "react-icons/bs";
+
 import useModal from '@/hooks/useModal';
 import Modal from '@/components/ui/Modal';
 
@@ -24,9 +26,10 @@ export default function CourtCard({ court, players, onComplete }: CourtCardProps
   const [newCourtName, setNewCourtName] = useState('');
 
   const renameModal = useModal();
+  const deleteModal = useModal();
 
   const { showToast } = useToast();
-  const { renameCourt } = useData(); // Get the renameCourt function
+  const { renameCourt, removeCourt } = useData(); // Get the renameCourt function
 
   const handleCompleteMatch = async () => {
     setisCompleteMatch(true);
@@ -139,6 +142,18 @@ export default function CourtCard({ court, players, onComplete }: CourtCardProps
       renameModal.closeModal();
     }
   };
+
+  const handleDeleteCourt = () => {
+    if (court.status === 'occupied') {
+      showToast('Cannot delete a court that is currently in use', 'error', 3000);
+      deleteModal.closeModal();
+      return;
+    }
+    
+    removeCourt(court.id);
+    showToast(`${court.name || `Court ${court.id}`} has been deleted`, 'success', 3000);
+    deleteModal.closeModal();
+  };
   
   return (
     <>
@@ -181,15 +196,56 @@ export default function CourtCard({ court, players, onComplete }: CourtCardProps
         </div>
       </Modal>
 
+      {/* Delete Court Confirmation Modal */}
+      <Modal
+        isOpen={deleteModal.isOpen}
+        onClose={deleteModal.closeModal}
+        title="Delete Court"
+        maxWidth="sm"
+      >
+        <div className="p-1">
+          <div className="mb-4">
+            <p className="text-gray-700 pb-2">
+              Are you sure you want to remove <strong>{court.name || `Court ${court.id}`}</strong>?
+            </p>
+          </div>
+          
+          <div className="flex justify-end space-x-2">
+            <button
+              onClick={deleteModal.closeModal}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleDeleteCourt}
+              className="px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-md cursor-pointer"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </Modal>
+
       <div className={`relative z-1 sm:p-4 p-3 h-full flex flex-col rounded-lg bg-[rgba(0,0,0,0.54)] min-h-[195px] sm:min-h-[232px] border border-[#3d3131]
         ${court.status === 'available' ? 'bg-[#262626]' : 'bg-amber-50'}`}>
         <div className="flex justify-between items-start mb-2">
           <h3 className={`text-[15px] font-bold flex items-center gap-1
             ${court.status === 'available' ? 'text-white' : 'text-[#262626]'}`}>
             {court.name || `Court #${court.id}`}
-            <button className="ml-1 hover:text-blue-500" onClick={handleOpenRenameModal}>
-              <HiOutlinePencilAlt className="w-4 h-4" />
+            <button className="ml-2 hover:text-blue-500 cursor-pointer" title="Edit court" onClick={handleOpenRenameModal}>
+              <FiEdit className="w-4 h-4" />
             </button>
+
+            {court.status === 'available' && (
+              <button 
+                className="ml-2 hover:text-red-500 cursor-pointer" 
+                onClick={deleteModal.openModal}
+                title="Delete court"
+              >
+                <BsTrash3 className="w-4 h-4" />
+              </button>
+            )}
           </h3>
           <span className={`px-2 py-1 rounded-[50px] text-[10px] border ${court.status === 'available' ? 'text-[#04c951] border-[#04c951] bg-[#210606]' : 'text-[#fd9a01] border-[#fd9a01]'}`}>
             {court.status.toUpperCase()}
