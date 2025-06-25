@@ -17,7 +17,7 @@ export default function CourtManagement() {
   };
   
   return (
-    <div className='mb-5 flex items-center justify-between gap-3 flex-wrap'>
+    <div className='mb-7 flex items-center justify-between gap-3 flex-wrap'>
       <h3 className="text-[16px] font-bold text-white">Court Management</h3>
       {courts.length <= 20 && (
         <button

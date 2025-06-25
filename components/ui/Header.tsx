@@ -62,22 +62,22 @@ export default function Header() {
             <Link href='/' className='flex items-center gap-[0.15rem]'>ShuttleFlow <GiShuttlecock className='rotate-[205deg]' /></Link>
           </h1>
           
-          <nav className="flex items-center space-x-3">
+          <nav className="flex items-center space-x-2.5">
             <Link 
               href="/" 
-              className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition ${isActive('/') && 'text-white bg-red-700'}`}
+              className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition flex items-center gap-[.15rem] ${isActive('/') && 'text-white bg-red-700'}`}
               onClick={handleCourtLinkClick}
             >
-              Court
+              <GiShuttlecock size=".82rem"/> <span>Court</span>
             </Link>
-            <Link href="/players" className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition ${isActive('/players') && 'text-white bg-red-700'}`}>
-              Queue
+            <Link href="/players" className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition flex items-center gap-[.35rem] ${isActive('/players') && 'text-white bg-red-700'}`}>
+              <BsPersonLinesFill size=".82rem"/> <span>Players</span>
             </Link>
-            <Link href="/fees" className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition ${isActive('/fees') && 'text-white bg-red-700'}`}>
-              Fees
+            <Link href="/fees" className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition flex items-center gap-[.35rem] ${isActive('/fees') && 'text-white bg-red-700'}`}>
+              <GrMoney size=".8rem"/><span>Fees</span>
             </Link>
-            <Link href="/settings" className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition ${isActive('/settings') && 'text-white bg-red-700'}`}>
-              Settings
+            <Link href="/settings" className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition flex items-center gap-[.3rem] ${isActive('/settings') && 'text-white bg-red-700'}`}>
+              <FiSettings size=".82rem"/><span>Settings</span>
             </Link>
           </nav>
         </div>
