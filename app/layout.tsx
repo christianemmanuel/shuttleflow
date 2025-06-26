@@ -11,7 +11,7 @@ const notoSans = Noto_Sans({
 
 
 export const metadata = {
-  title: 'ShuttleFlow - Smart Badminton Queuing Management',
+  title: 'ShuttleFlow - Smart Badminton Queueing Management',
   description: 'Smart badminton court management system',
   icons: {
     icon: '/favicon.ico',

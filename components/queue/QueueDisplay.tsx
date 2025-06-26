@@ -466,7 +466,7 @@ export default function QueueDisplay() {
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-md mb-5">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-2.5">
         <div className="flex items-center">
           <h2 className="text-lg font-bold mr-2">Queue</h2>
           {queue.length > 0 && (
@@ -482,9 +482,9 @@ export default function QueueDisplay() {
             <button
               onClick={handleCreateLink}
               // disabled={isCreatingLink || queue.length === 0}
-              className={`flex items-center space-x-1 px-0 py-1.5 rounded text-sm text-blue-500 ${
+              className={`flex items-center space-x-1 px-0 py-1.5 rounded text-sm text-blue-500 cursor-pointer ${
                 queue.length === 0 
-                  ? '' 
+                  ? 'text-gray-600' 
                   : ''
               }`}
             >
@@ -494,7 +494,7 @@ export default function QueueDisplay() {
           ) : (
             <button
               onClick={handleStopSharing}
-              className="flex items-center space-x-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-sm"
+              className="flex items-center space-x-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-sm cursor-pointer"
             >
               <FaStopCircle size={14} />
               <span>Stop Sharing</span>
@@ -525,7 +525,7 @@ export default function QueueDisplay() {
             />
             <button
               onClick={handleCopyLink}
-              className="bg-blue-500 hover:bg-blue-600 text-white py-1.5 px-4 rounded-r-md flex items-center"
+              className="bg-blue-500 hover:bg-blue-600 text-white py-1.5 px-4 rounded-r-md flex items-center cursor-pointer"
               title="Copy Link"
             >
               <FaCopy size={14} />
@@ -534,7 +534,7 @@ export default function QueueDisplay() {
           <div className="mt-2 flex justify-end">
             <button
               onClick={handleShowQRCode}
-              className="flex items-center space-x-1 text-blue-600 hover:text-blue-800 text-sm"
+              className="flex items-center space-x-1 text-blue-600 hover:text-blue-800 text-sm cursor-pointer"
             >
               <FaQrcode size={14} />
               <span>Show QR Code</span>
